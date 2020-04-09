@@ -1,18 +1,18 @@
 #### mtDNA-assemble
 
 
-  ##### 1) canu assemble
-$ conda create -n canu canu -y <br>
-$ conda activate canu <br>
-###### 1.1) 纠错
+  #### 1) canu assemble
+$ conda create -n canu canu -y
+$ conda activate canu
+    ##### 1.1) 纠错
 ###### -p 指定输出前缀；-d 指定输出结果目录；genomeSize设置一个预估的基因组大小，便于让Canu估计测序深度，单位是g，m，k；maxThreads 设置最大线程数；minReadLength 表示只使用大于阈值的序列；minOverlapLength 设置Overlap的最小长度，提高minReadLength可以提高运行速度，增加minOverlapLength可以降低假阳性的overlap；另外需要指定输入数据的类型，是原始测序的数据，还是经过处理的：-pacbio-raw 直接测序得到的原始pacbio数据；-pacbio-corrected 经过纠正的pacbio数据；-nanopore-raw 原始的nanopore数据；-nanopore-corrected 结果纠正的nanopore数据；corOutCoverage: 用于控制多少数据用于纠错。比如说拟南芥是120M基因组，100X测序后得到了12G数据，如果只打算使用最长的6G数据进行纠错，那么参数就要设置为50(120m x 50)。设置一个大于测序深度的数值，例如120，表示使用所有数据。
 $ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz
 ###### Corrected reads saved in 'mtDNA.correctedReads.fasta.gz'.
 ###### 1.2) 修整
 $ canu -trim -p mtDNA -d ./trim maxThreads=8 genomeSize=450k minReadLength=2000 minOverlapLength=500 -pacbio-corrected ./correct/mtDNA.correctedReads.fasta.gz
-    ###### Trimmed reads saved in 'mtDNA.trimmedReads.fasta.gz'.
-    ###### 1.3) 组装
-    ###### 这里需要调整纠错后的错误率， correctedErrorRate: 两个read交叠部分的差异程度的忍受程度，降低此值可以减少运行时间，如果覆盖率高的话，建议降低这个值，它会影响utgOvlErrorRate。这一步可以尝试多个参数，因为速度比较块。
+###### Trimmed reads saved in 'mtDNA.trimmedReads.fasta.gz'.
+###### 1.3) 组装
+###### 这里需要调整纠错后的错误率， correctedErrorRate: 两个read交叠部分的差异程度的忍受程度，降低此值可以减少运行时间，如果覆盖率高的话，建议降低这个值，它会影响utgOvlErrorRate。这一步可以尝试多个参数，因为速度比较块。
     ###### error rate 0.035
 $ canu -assemble -p mtDNA -d ./assemble_0.035 maxThreads=20  genomeSize=450k correctedErrorRate=0.035 -pacbio-corrected ../mapping/mtDNA.trimmedReads_minimap2.fastq
     ###### $ canu -assemble -p mtDNA -d ./assemble_0.035 maxThreads=20  genomeSize=450k errorRate=0.035 -pacbio-corrected ../mapping/mtDNA.trimmedReads_minimap2.fastq
