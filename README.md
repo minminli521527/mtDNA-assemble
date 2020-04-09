@@ -1,10 +1,10 @@
 #### mtDNA-assemble
 
 
-  #### 1) canu assemble
+  #### 1.) canu assemble
 $ conda create -n canu canu -y
 $ conda activate canu
-##### 1.1) 纠错
+###### 1.1) 纠错
 ###### -p 指定输出前缀；-d 指定输出结果目录；genomeSize设置一个预估的基因组大小，便于让Canu估计测序深度，单位是g，m，k；maxThreads 设置最大线程数；minReadLength 表示只使用大于阈值的序列；minOverlapLength 设置Overlap的最小长度，提高minReadLength可以提高运行速度，增加minOverlapLength可以降低假阳性的overlap；另外需要指定输入数据的类型，是原始测序的数据，还是经过处理的：-pacbio-raw 直接测序得到的原始pacbio数据；-pacbio-corrected 经过纠正的pacbio数据；-nanopore-raw 原始的nanopore数据；-nanopore-corrected 结果纠正的nanopore数据；corOutCoverage: 用于控制多少数据用于纠错。比如说拟南芥是120M基因组，100X测序后得到了12G数据，如果只打算使用最长的6G数据进行纠错，那么参数就要设置为50(120m x 50)。设置一个大于测序深度的数值，例如120，表示使用所有数据。
 $ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz
 ###### Corrected reads saved in 'mtDNA.correctedReads.fasta.gz'.
@@ -23,7 +23,7 @@ $ canu -assemble -p mtDNA -d ./assemble_0.050 maxThreads=20  genomeSize=450k cor
 
 
 
-  #### 2) Falcon assemble
+  #### 2.) Falcon assemble
 $ conda create -n pb-assembly pb-assembly
 $ conda activate pb-assembly
 ###### 2.1) 创建input_fofn
@@ -41,7 +41,7 @@ $ fc_run.py fc_run_local.cfg
 
 
 
-  #### 3) MECAT2 assemble  
+  #### 3.) MECAT2 assemble  
 ###### http://blog.sciencenet.cn/blog-3406804-1203984.html
 ###### 直接下载二进制版本
 $ wget https://github.com/xiaochuanle/MECAT2/releases/download/20192026/mecat2_20190226_linuax_amd64.tar.gz
@@ -67,7 +67,7 @@ $ mecat.pl assemble config_file.txt
 
 
 
-  #### 4) NextDenovo assemble
+  #### 4.) NextDenovo assemble
 ###### NextDenovo软件安装
 ###### 下载已编译好的二进制版，可直接使用，无需安装。
 $  wget https://github.com/Nextomics/NextDenovo/releases/download/v2.1-beta.0/NextDenovo.tgz
@@ -91,7 +91,7 @@ $ nextDenovo run.cfg
 
 
 
-  #### 5) wtdbg2 assemble
+  #### 5.) wtdbg2 assemble
 $ conda activate canu
 ###### 5.1) canu纠错
 $ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz
@@ -113,7 +113,7 @@ $ less prefix.ctg.lay.2nd.fa | grep ">"
 
 
 
-  #### 6) quickmerge assemble
+  #### 6.) quickmerge assemble
 ###### 6.1) 一步法：运行一个py脚本
 $ merge_wrapper.py prefix.ctg.lay.2nd.fa  nextgraph.assembly.contig.fasta
 ###### ......
