@@ -1,0 +1,78 @@
+#### Input()
+[General]
+# 设置数据输入文件为input.fofn，该文本文件中每行是一个PacBio测序数据的FASTA文件路径。可以使用相对路径。
+input_fofn = /home/.../.../.../input.fofn
+# 设置输入数据类型为原始测序数据（raw），或者为修正后的数据（preads）。
+input_type = raw
+#input_type = preads
+pa_DBdust_option=
+pa_fasta_filter_option=pass
+target=assembly
+skip_checks=False
+LA4Falcon_preload=false
+
+#### Data Partitioning(数据分块)
+# -x:忽略长度小于指定阈值的reads。-s:该参数默认值为200，软件作者推荐对小于10Mb的基因组设置该参数值为50，对于大基因组设置该参数值为200/400。
+# raw reads
+pa_DBsplit_option = -x500 –s50
+# preads
+ovlp_DBsplit_option=-x500 –s50
+
+#### Repeat Masking(屏蔽重复序列)
+pa_HPCTANmask_option=
+pa_REPmask_code=1,100;2,80;3,60
+
+####Pre-assembly(预组装)
+# 设置对种子序列的长度筛选阈值。若该参数值设置为-1，则程序自动计算种子序列的长度筛选阈值，根据genome_size/seed_coverage两个参数挑选最长的reads序列作为种子序列，直到其数据量达到基因组指定覆盖度为止。设置基因组大小和种子序列覆盖度，推荐设置seed_coverage参数的值为20~40x。当然是用更多的种子序列有利于基因组的组装效果，但是会消耗更多运行时间。
+# pa_daligner_option: -e:错误率，低质量序列设置为0.70，高质量设置为0.80。-l: 最低overlap的长度，文库比较短时为1000， 文库比较长为5000.
+# --output-multi输出每个种子序列多个修正后的区域。--min-cov default: 6 设置当种子序列上某位点覆盖度低于指定阈值时，则在该位点对序列打断或截短。--min-cov-aln default: 10 设置当种子序列的平均覆盖度低于指定阈值时，过滤掉该序列。--min-n-read default: 10。--max-n-read default: 500。对覆盖度在--min-n-read和--max-n-read两个参数设定范围内的位点进行一致性分析，从而对种子序列进行校正。--min-idt default: 0.7 设置比对结果中reads重叠部分的最小identity阈值。
+genome_size = 524797
+seed_coverage = 30
+length_cutoff = -1   
+pa_HPCdaligner_option=-v -B128 -M24
+pa_daligner_option=-e.7 -l1000 -k18 -h80 -w8 -s100
+falcon_sense_option=--output-multi --min-idt 0.70 --min-cov 2 --max-n-read 800
+falcon_sense_greedy=False
+falcon_sense_skip_contained = False
+
+####Pread overlapping(纠错后相互比对)
+# 和上面的参数类似，但是-e的范围调整为0.93-0.96，-l范围调整为1800-6000， -k调整为 18-24
+ovlp_daligner_option=-e.96 -l2000 -k24 -h1024 -w6 -s100
+ovlp_HPCdaligner_option=-v -B128 -M24
+
+####Final Assembly(最后组装)
+# 这里的参数就可以随便调整了，因为这一步速度很快。 例如length_cutoff_pr就可以从2000，提高到15000.
+overlap_filtering_setting=--max-diff 100 --max-cov 300 --min-cov 2
+fc_ovlp_to_graph_option=
+length_cutoff_pr=12000
+
+# 最后还有一部分是任务投递系统，如果是单节点运行，需要注意设置 njobs，这是同时投递的任务数。假如设置[job.step.cns]: 8(NPROC)*50(njobs) = 400 个任务，如果你的内存只有128G，运行一段时间后你的所有内存就会被耗尽，那么基本上你就只能重启服务器了。
+[job.defaults]
+job_type=local
+pwatcher_type=blocking
+JOB_QUEUE=default
+MB=32768
+NPROC=6
+njobs=32
+submit = /bin/bash -c "${JOB_SCRIPT}" > "${JOB_STDOUT}" 2> "${JOB_STDERR}"
+
+[job.step.da]
+NPROC=4
+MB=32768
+njobs=32
+[job.step.la]
+NPROC=4
+MB=32768
+njobs=32
+[job.step.cns]
+NPROC=2
+MB=65536
+njobs=3
+[job.step.pla]
+NPROC=4
+MB=32768
+njobs=4
+[job.step.asm]
+NPROC=24
+MB=196608
+njobs=1
