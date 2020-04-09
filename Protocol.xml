@@ -1,0 +1,8 @@
+<jellyProtocol>
+    <reference>基因组fasta文件的路径</reference>  
+    <outputDir>输出文件路径</outputDir>
+    <blasr>-minMatch 8 -minPctIdentity 70 -bestn 1 -nCandidates 20 -maxScore -500 -nproc 24 -noSplitSubreads</blasr>
+    <input baseDir="输入Pacbio reads数据文件所在的文件夹">
+        <job>Pacbio数据文件名称</job>
+    </input>
+</jellyProtocol>
