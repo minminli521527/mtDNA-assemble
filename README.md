@@ -2,8 +2,8 @@
 
 
   ##### 1) canu assemble
-$ conda create -n canu canu -y
-$ conda activate canu
+$ conda create -n canu canu -y <br>
+$ conda activate canu <br>
     ###### 1.1) 纠错
     ###### -p 指定输出前缀；-d 指定输出结果目录；genomeSize设置一个预估的基因组大小，便于让Canu估计测序深度，单位是g，m，k；maxThreads 设置最大线程数；minReadLength 表示只使用大于阈值的序列；minOverlapLength 设置Overlap的最小长度，提高minReadLength可以提高运行速度，增加minOverlapLength可以降低假阳性的overlap；另外需要指定输入数据的类型，是原始测序的数据，还是经过处理的：-pacbio-raw 直接测序得到的原始pacbio数据；-pacbio-corrected 经过纠正的pacbio数据；-nanopore-raw 原始的nanopore数据；-nanopore-corrected 结果纠正的nanopore数据；corOutCoverage: 用于控制多少数据用于纠错。比如说拟南芥是120M基因组，100X测序后得到了12G数据，如果只打算使用最长的6G数据进行纠错，那么参数就要设置为50(120m x 50)。设置一个大于测序深度的数值，例如120，表示使用所有数据。
 $ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz
