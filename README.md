@@ -127,3 +127,70 @@ $ delta-filter -i 5 -r -q wtdbg2_nextDenovo.delta > wtdbg2_nextDenovo.rq.delta
 ###### 一般-l选择引用(-r)参考序列组装的N50作为初始值，quast计算。-ml一般大于5000。
 $ quickmerge -d wtdbg2_nextDenovo.rq.delta -q ./prefix.ctg.lay.2nd.fa -r ./nextgraph.assembly.contig.fasta -hco 5.0 -c 1.5 -l 34171 -ml 6000 -p wtdbg2_nextDenovo
 ###### 结果是merged_wtdbg2_nextDenovo.fasta
+
+
+
+  #### 7.) BLAST比对数据库，初步获取线粒体序列
+$ conda create blast blast -y
+$ conda activate blast
+###### 参考：http://blog.sciencenet.cn/blog-3406804-1199850.html
+###### 需要用到本地版的NCBI核酸数据库（下文简称NT库），通过后续进行本地BLAST，在组装结果中挑选出比对到线粒体的contigs序列。
+###### 将所有得到的contigs/scaffolds序列与NT库中收录的核酸序列做BLAST比对，定位目标序列。
+###### 7.1) blastn 核酸比对，指定 NT 库路径，默认对每条序列输出一条最佳 hits 
+$ blastn -db /database/nt/nt -query ./configs.fasta -out blast -num_threads 4 -num_descriptions 1 -num_alignments 1 -dust no
+###### 7.2) 对blast结果格式作个转化，perl脚本获取链接：https://pan.baidu.com/s/1-HkUh_C9JgYH9q-J2R7ZDA
+$ perl blast_trans.pl spades_blast spades_blast.txt
+###### 7.3) 根据注释描述，提取其中命中到“线粒体”的序列比对结果
+$ grep 'mitocho' blast.txt > blast.select.txt
+###### 7.4) 查看“blast.select.txt”，该文件中只保留了能够比对至数据库中已知线粒体序列的结果，即可大致确定哪些contigs序列是来自线粒体的。
+
+
+
+  #### 8.) contigs的定位和定向
+###### 需要结合手动过程
+###### 经过初步拼接后，获得了几个组装结果fasta文件。这些fasta文件中通常存在多条contigs/scaffolds序列（仅凭软件自动组装得到一整条序列，几乎不太可能），下一步就需要确定这些contigs/scaffolds序列在基因组中的相对位置和方向（定位和定向），以继续往完整的环状线粒体基因组序列搭建。
+###### 这一步也需借助参考基因组来完成。将组装得到的那些contigs/scaffolds序列与参考基因组对齐，确定位置和方向关系。
+###### BLAST比对结果中，给出了这些contigs/scaffolds序列最佳命中的参考线粒体基因组序列名称。可以从中找一条最相似的参考基因组，通过ID在NCBI或EMBL等数据库中下载它们，辅助我们确定这些contigs/scaffolds序列在基因组中的相对位置和方向（定位和定向）。此外，参考基因组还能帮助我们确定自己线粒体基因组的最终长度范围。
+###### 能够实现该功能的工具有很多，可视化的工具如geneious，命令行工具如MUMmer，等等。
+###### 8.1) 例如通过MUMmer共线性分析定位 contigs/scaffolds的顺序
+###### 参考基因组序列要单一物种的，不要混合物种的
+$ conda create mummer mummer -y
+$ conda activate mummer
+$ mkdir mummer && cd mummer
+$ nucmer --mum -p mitochondria ref_NC_030753.1.fasta mtDNA.contigs.fasta
+$ delta-filter -m mitochondria.delta > mitochondria.filter
+$ show-coords -T -r -l mitochondria.filter > mitochondria.1coords
+$ mummerplot --postscript -p mitochondria mitochondria.delta
+$ ps2pdf mitochondria.ps mitochondria.pdf
+###### 对于共线性分析结果，可以直接查看文本结果文件“mitochondria.1coords”中的内容，记录了组装scaffolds序列和参考基因组序列的共线性匹配详细信息。或者更直观的，查看最后生成的共线性结果图，紫色/红色表示正向，蓝色表示反向。
+###### 8.2) 依次提取序列--按照顺序组合得到tig_2.fasta
+$ samtools faidx mtDNA.contigs.fasta
+$ samtools faidx mtDNA.contigs.fasta tig00000011 > tig00000011.fa
+$ ......
+###### 提取反向互补序列
+$ seqkit seq -t dna tig00000045.fa -r -p > tig00000045-RC.fa
+###### 组合不同的序列
+$ cat tig000000011.fa tig00000045-RC.fa tig00000044.fa tig00000009-RC.fa tig00000027-RC.fa tig00000030-RC.fa tig00000058-RC.fa tig00000032.fa tig00000029.fa tig00000046.fa tig00000018.fa tig00000068.fa tig00000040.fa tig00000050.fa tig00000062-RC.fa tig00000044-RC.fa tig00000024-RC.fa tig00000020.fa tig00000054.fa tig00000061-RC.fa tig00000019.fa tig00000009.fa tig00000044-RC.fa tig00000011.fa tig00000060.fa tig00000038-RC.fa tig00000021-RC.fa tig00000013-RC.fa tig00000043-RC.fa tig00000012.fa tig00000046-RC.fa tig00000035-RC.fa tig00000014-RC.fa > tig_2.fasta
+###### 8.3) 对tig_2.fasta重复步骤1，再次进行共线性分析
+
+
+
+  #### 9.) PBJelly2用于利用Pacbio数据进行基因组补洞和scaffold连接
+###### 如果上一步并未完全将线粒体基因组环起来，中间还存在gap，那么这一部分的内容将会是有用的。
+###### 9.1) PBJelly2软件安装
+###### 按照步骤：https://sr-c.github.io/2019/07/02/PBJelly-and-blasr-installation/，安装PBJelly2，同时借鉴步骤：http://cache.baiducontent.com/c?m=9f65cb4a8c8507ed4fece763105392230e54f73266808c4b2487cf1cd4735b36163bbca63023644280906b6677ed1a0dbaab6b66725e60e1948ad8128ae5cc6338895734&p=c363c64ad4d914f306bd9b78084d&newp=8f73c64ad48811a05ee8c6365f4492695d0fc20e38d3d701298ffe0cc4241a1a1a3aecbf2d211301d7c47f6006a54359e9fb30703d0034f1f689df08d2ecce7e64&user=baidu&fm=sc&query=pbjelly2&qid=e4e870de000cfaa0&p1=9，安装PBJelly2软件。
+###### 特别注意：需要在python2.7环境运行，否则报错.py，##行
+###### 特别注意：conda install networkx==1.11
+###### 9.2) 运行
+###### 首先创建配置文件 Protocol.xml
+###### 然后依次运行下6步：
+$ Jelly.py setup Protocol.xml
+$ Jelly.py mapping Protocol.xml
+$ Jelly.py support Protocol.xml
+$ Jelly.py extraction Protocol.xml
+$ Jelly.py assembly Protocol.xml -x "--nproc=24"
+$ Jelly.py output Protocol.xml
+###### --nproc 参数设置运行线程数。
+###### 输出结果文件为 jelly.out.fasta 。
+###### 使用 PBJelly2 进行 scaffold 连接
+$ grep -Ho N jelly.out.fasta | uniq -c
