@@ -4,7 +4,7 @@
   #### 1) canu assemble
 $ conda create -n canu canu -y
 $ conda activate canu
-    ##### 1.1) 纠错
+##### 1.1) 纠错
 ###### -p 指定输出前缀；-d 指定输出结果目录；genomeSize设置一个预估的基因组大小，便于让Canu估计测序深度，单位是g，m，k；maxThreads 设置最大线程数；minReadLength 表示只使用大于阈值的序列；minOverlapLength 设置Overlap的最小长度，提高minReadLength可以提高运行速度，增加minOverlapLength可以降低假阳性的overlap；另外需要指定输入数据的类型，是原始测序的数据，还是经过处理的：-pacbio-raw 直接测序得到的原始pacbio数据；-pacbio-corrected 经过纠正的pacbio数据；-nanopore-raw 原始的nanopore数据；-nanopore-corrected 结果纠正的nanopore数据；corOutCoverage: 用于控制多少数据用于纠错。比如说拟南芥是120M基因组，100X测序后得到了12G数据，如果只打算使用最长的6G数据进行纠错，那么参数就要设置为50(120m x 50)。设置一个大于测序深度的数值，例如120，表示使用所有数据。
 $ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz
 ###### Corrected reads saved in 'mtDNA.correctedReads.fasta.gz'.
@@ -13,27 +13,27 @@ $ canu -trim -p mtDNA -d ./trim maxThreads=8 genomeSize=450k minReadLength=2000 
 ###### Trimmed reads saved in 'mtDNA.trimmedReads.fasta.gz'.
 ###### 1.3) 组装
 ###### 这里需要调整纠错后的错误率， correctedErrorRate: 两个read交叠部分的差异程度的忍受程度，降低此值可以减少运行时间，如果覆盖率高的话，建议降低这个值，它会影响utgOvlErrorRate。这一步可以尝试多个参数，因为速度比较块。
-    ###### error rate 0.035
+###### error rate 0.035
 $ canu -assemble -p mtDNA -d ./assemble_0.035 maxThreads=20  genomeSize=450k correctedErrorRate=0.035 -pacbio-corrected ../mapping/mtDNA.trimmedReads_minimap2.fastq
-    ###### $ canu -assemble -p mtDNA -d ./assemble_0.035 maxThreads=20  genomeSize=450k errorRate=0.035 -pacbio-corrected ../mapping/mtDNA.trimmedReads_minimap2.fastq
-    ###### 最后输出文件下的mtDNA.contigs.fasta就是结果文件
-    ###### error rate 0.050
+###### $ canu -assemble -p mtDNA -d ./assemble_0.035 maxThreads=20  genomeSize=450k errorRate=0.035 -pacbio-corrected ../mapping/mtDNA.trimmedReads_minimap2.fastq
+###### 最后输出文件下的mtDNA.contigs.fasta就是结果文件
+###### error rate 0.050
 $ canu -assemble -p mtDNA -d ./assemble_0.050 maxThreads=20  genomeSize=450k correctedErrorRate=0.050 -pacbio-corrected ../mapping/mtDNA.trimmedReads_minimap2.fastq
-    ###### 最后输出文件下的mtDNA.contigs.fasta就是结果文件
+###### 最后输出文件下的mtDNA.contigs.fasta就是结果文件
 
 
 
-  ##### 2) Falcon assemble
+  #### 2) Falcon assemble
 $ conda create -n pb-assembly pb-assembly
 $ conda activate pb-assembly
-    ###### 2.1) 创建input_fofn
-    ###### FOFN指的是包含文件名的文件, 每一行里面都要有fasta文件的全路径:
-    ###### 2.2) 创建配置文件
-    ###### 配置文件fc_run.cfg最好是下载模板，进行修改，否则容易出错，配置文件控制着Falcon组装的各个阶段所用的参数，然而一开始我们并不知道哪一个参数才是最优的，通常都需要不断的调整才行。当然由于目前已经有比较多的物种使用了Falcon进行组装，所以可以从他们的配置文件中进行借鉴(https://pb-falcon.readthedocs.io/en/latest/parameters.html)
+###### 2.1) 创建input_fofn
+###### FOFN指的是包含文件名的文件, 每一行里面都要有fasta文件的全路径:
+###### 2.2) 创建配置文件
+###### 配置文件fc_run.cfg最好是下载模板，进行修改，否则容易出错，配置文件控制着Falcon组装的各个阶段所用的参数，然而一开始我们并不知道哪一个参数才是最优的，通常都需要不断的调整才行。当然由于目前已经有比较多的物种使用了Falcon进行组装，所以可以从他们的配置文件中进行借鉴(https://pb-falcon.readthedocs.io/en/latest/parameters.html)
 $ wget https://pb-falcon.readthedocs.io/en/latest/_downloads/fc_run_ecoli_local.cfg
-    ###### 该文件的大部分内容都不需要修改，除了如下几个参数：input_fofn: 这里的input.fofn就是上一步创建的文件。建议把该文件放在cfg文件的同级目录下，这样子就不需要改配置文件该文件的路径了。genome_size,seed_coverage,length_cutoff,length-cutoff_pr 这三个参数控制纠错所用数据量和组装所用数据量. 如果要让程序在运行的时候自动确定用于纠错的数据量，就将length_cutoff设置成"-1"，同时设置基因组估计大小genome_size和用于纠错的深度seed_coverage。jobqueue: 这里用的是单主机而不是集群，所以其实随便取一个名字就行，但是对于SGE则要选择能够提交的队列名。xxx_concurrent_jobs: 同时运行的任务数。显然是越多越快，有些配置文件都写了192，但是对于大部分人而言是没有那么多资源资源的，盲目写多只会导致服务器宕机。
-    ###### 2.3) 运行
-    ###### Falcon的运行非常简单，就是准备好配置文件传给fc_run.py，然后让fc_run.py调度所有需要的软件完成基因组组装即可。
+###### 该文件的大部分内容都不需要修改，除了如下几个参数：input_fofn: 这里的input.fofn就是上一步创建的文件。建议把该文件放在cfg文件的同级目录下，这样子就不需要改配置文件该文件的路径了。genome_size,seed_coverage,length_cutoff,length-cutoff_pr 这三个参数控制纠错所用数据量和组装所用数据量. 如果要让程序在运行的时候自动确定用于纠错的数据量，就将length_cutoff设置成"-1"，同时设置基因组估计大小genome_size和用于纠错的深度seed_coverage。jobqueue: 这里用的是单主机而不是集群，所以其实随便取一个名字就行，但是对于SGE则要选择能够提交的队列名。xxx_concurrent_jobs: 同时运行的任务数。显然是越多越快，有些配置文件都写了192，但是对于大部分人而言是没有那么多资源资源的，盲目写多只会导致服务器宕机。
+###### 2.3) 运行
+###### Falcon的运行非常简单，就是准备好配置文件传给fc_run.py，然后让fc_run.py调度所有需要的软件完成基因组组装即可。
 $ fc_run.py fc_run_local.cfg
     ###### 生成的最终主要结果文件为 2-asm-falcon/p_ctg.fa
     ###### 0-rawreads/该目录存放对raw subreads进行overlpping分析与校正的结果；0-rawreads/cns-runs/cns_*/*/*.fasta存放校正后的序列信息；1-preads_ovl/该目录存放对校正后reads进行overlapping的结果；2-asm-falcon/该目录是最终结果目录，主要的结果文件是p_ctg.fa和a_ctg.fa
