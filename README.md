@@ -35,8 +35,8 @@ $ wget https://pb-falcon.readthedocs.io/en/latest/_downloads/fc_run_ecoli_local.
 ###### 2.3) 运行
 ###### Falcon的运行非常简单，就是准备好配置文件传给fc_run.py，然后让fc_run.py调度所有需要的软件完成基因组组装即可。
 $ fc_run.py fc_run_local.cfg
-    ###### 生成的最终主要结果文件为 2-asm-falcon/p_ctg.fa
-    ###### 0-rawreads/该目录存放对raw subreads进行overlpping分析与校正的结果；0-rawreads/cns-runs/cns_*/*/*.fasta存放校正后的序列信息；1-preads_ovl/该目录存放对校正后reads进行overlapping的结果；2-asm-falcon/该目录是最终结果目录，主要的结果文件是p_ctg.fa和a_ctg.fa
+###### 生成的最终主要结果文件为 2-asm-falcon/p_ctg.fa
+###### 0-rawreads/该目录存放对raw subreads进行overlpping分析与校正的结果；0-rawreads/cns-runs/cns_*/*/*.fasta存放校正后的序列信息；1-preads_ovl/该目录存放对校正后reads进行overlapping的结果；2-asm-falcon/该目录是最终结果目录，主要的结果文件是p_ctg.fa和a_ctg.fa
 
 
 
