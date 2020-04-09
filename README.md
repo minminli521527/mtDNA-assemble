@@ -1,8 +1,8 @@
-#### mtDNA-assemble
+# mtDNA-assemble
 
 
 
-  #### 1.) canu assemble
+  ## 1.) canu assemble
 $ conda create -n canu canu -y
 $ conda activate canu
 ###### 1.1) 纠错
@@ -24,7 +24,7 @@ $ canu -assemble -p mtDNA -d ./assemble_0.050 maxThreads=20  genomeSize=450k cor
 
 
 
-  #### 2.) Falcon assemble
+  ## 2.) Falcon assemble
 $ conda create -n pb-assembly pb-assembly
 $ conda activate pb-assembly
 ###### 2.1) 创建input_fofn
@@ -42,7 +42,7 @@ $ fc_run.py fc_run_local.cfg
 
 
 
-  #### 3.) MECAT2 assemble  
+  ## 3.) MECAT2 assemble  
 ###### http://blog.sciencenet.cn/blog-3406804-1203984.html
 ###### 直接下载二进制版本
 $ wget https://github.com/xiaochuanle/MECAT2/releases/download/20192026/mecat2_20190226_linuax_amd64.tar.gz
@@ -68,7 +68,7 @@ $ mecat.pl assemble config_file.txt
 
 
 
-  #### 4.) NextDenovo assemble
+  ## 4.) NextDenovo assemble
 ###### NextDenovo软件安装
 ###### 下载已编译好的二进制版，可直接使用，无需安装。
 $  wget https://github.com/Nextomics/NextDenovo/releases/download/v2.1-beta.0/NextDenovo.tgz
@@ -92,7 +92,7 @@ $ nextDenovo run.cfg
 
 
 
-  #### 5.) wtdbg2 assemble
+  ## 5.) wtdbg2 assemble
 $ conda activate canu
 ###### 5.1) canu纠错
 $ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz
@@ -114,7 +114,7 @@ $ less prefix.ctg.lay.2nd.fa | grep ">"
 
 
 
-  #### 6.) quickmerge assemble
+  ## 6.) quickmerge assemble
 ###### 6.1) 一步法：运行一个py脚本
 $ merge_wrapper.py prefix.ctg.lay.2nd.fa  nextgraph.assembly.contig.fasta
 ###### ......
@@ -130,7 +130,7 @@ $ quickmerge -d wtdbg2_nextDenovo.rq.delta -q ./prefix.ctg.lay.2nd.fa -r ./nextg
 
 
 
-  #### 7.) BLAST比对数据库，初步获取线粒体序列
+  ## 7.) BLAST比对数据库，初步获取线粒体序列
 $ conda create blast blast -y
 $ conda activate blast
 ###### 参考：http://blog.sciencenet.cn/blog-3406804-1199850.html
@@ -146,7 +146,7 @@ $ grep 'mitocho' blast.txt > blast.select.txt
 
 
 
-  #### 8.) contigs的定位和定向
+  ## 8.) contigs的定位和定向
 ###### 需要结合手动过程
 ###### 经过初步拼接后，获得了几个组装结果fasta文件。这些fasta文件中通常存在多条contigs/scaffolds序列（仅凭软件自动组装得到一整条序列，几乎不太可能），下一步就需要确定这些contigs/scaffolds序列在基因组中的相对位置和方向（定位和定向），以继续往完整的环状线粒体基因组序列搭建。
 ###### 这一步也需借助参考基因组来完成。将组装得到的那些contigs/scaffolds序列与参考基因组对齐，确定位置和方向关系。
@@ -175,7 +175,7 @@ $ cat tig000000011.fa tig00000045-RC.fa tig00000044.fa tig00000009-RC.fa tig0000
 
 
 
-  #### 9.) PBJelly2用于利用Pacbio数据进行基因组补洞和scaffold连接
+  ## 9.) PBJelly2用于利用Pacbio数据进行基因组补洞和scaffold连接
 ###### 如果上一步并未完全将线粒体基因组环起来，中间还存在gap，那么这一部分的内容将会是有用的。
 ###### 9.1) PBJelly2软件安装
 ###### 按照步骤：https://sr-c.github.io/2019/07/02/PBJelly-and-blasr-installation/，安装PBJelly2，同时借鉴步骤：http://cache.baiducontent.com/c?m=9f65cb4a8c8507ed4fece763105392230e54f73266808c4b2487cf1cd4735b36163bbca63023644280906b6677ed1a0dbaab6b66725e60e1948ad8128ae5cc6338895734&p=c363c64ad4d914f306bd9b78084d&newp=8f73c64ad48811a05ee8c6365f4492695d0fc20e38d3d701298ffe0cc4241a1a1a3aecbf2d211301d7c47f6006a54359e9fb30703d0034f1f689df08d2ecce7e64&user=baidu&fm=sc&query=pbjelly2&qid=e4e870de000cfaa0&p1=9，安装PBJelly2软件。
