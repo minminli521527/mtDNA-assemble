@@ -28,17 +28,17 @@
 
   ## 2.) Falcon assemble
 ###### Falcon software installation
-$ conda create -n pb-assembly pb-assembly
-$ conda activate pb-assembly
+	$ conda create -n pb-assembly pb-assembly
+	$ conda activate pb-assembly
 ###### 2.1) 创建input_fofn
 ###### FOFN指的是包含文件名的文件, 每一行里面都要有fasta文件的全路径:
 ###### 2.2) 创建配置文件
 ###### 配置文件fc_run.cfg最好是下载模板，进行修改，否则容易出错，配置文件控制着Falcon组装的各个阶段所用的参数，然而一开始我们并不知道哪一个参数才是最优的，通常都需要不断的调整才行。当然由于目前已经有比较多的物种使用了Falcon进行组装，所以可以从他们的配置文件中进行借鉴(https://pb-falcon.readthedocs.io/en/latest/parameters.html)
-$ wget https://pb-falcon.readthedocs.io/en/latest/_downloads/fc_run_ecoli_local.cfg
+	$ wget https://pb-falcon.readthedocs.io/en/latest/_downloads/fc_run_ecoli_local.cfg
 ###### 该文件的大部分内容都不需要修改，除了如下几个参数：input_fofn: 这里的input.fofn就是上一步创建的文件。建议把该文件放在cfg文件的同级目录下，这样子就不需要改配置文件该文件的路径了。genome_size,seed_coverage,length_cutoff,length-cutoff_pr 这三个参数控制纠错所用数据量和组装所用数据量. 如果要让程序在运行的时候自动确定用于纠错的数据量，就将length_cutoff设置成"-1"，同时设置基因组估计大小genome_size和用于纠错的深度seed_coverage。jobqueue: 这里用的是单主机而不是集群，所以其实随便取一个名字就行，但是对于SGE则要选择能够提交的队列名。xxx_concurrent_jobs: 同时运行的任务数。显然是越多越快，有些配置文件都写了192，但是对于大部分人而言是没有那么多资源资源的，盲目写多只会导致服务器宕机。
 ###### 2.3) 运行
 ###### Falcon的运行非常简单，就是准备好配置文件传给fc_run.py，然后让fc_run.py调度所有需要的软件完成基因组组装即可。
-$ fc_run.py fc_run_local.cfg
+	$ fc_run.py fc_run_local.cfg
 ###### 生成的最终主要结果文件为 2-asm-falcon/p_ctg.fa
 ###### 0-rawreads/该目录存放对raw subreads进行overlpping分析与校正的结果；0-rawreads/cns-runs/cns_*/*/*.fasta存放校正后的序列信息；1-preads_ovl/该目录存放对校正后reads进行overlapping的结果；2-asm-falcon/该目录是最终结果目录，主要的结果文件是p_ctg.fa和a_ctg.fa
 
@@ -48,21 +48,21 @@ $ fc_run.py fc_run_local.cfg
   ## 3.) MECAT2 assemble  
 ###### http://blog.sciencenet.cn/blog-3406804-1203984.html
 ###### 直接下载二进制版本
-$ wget https://github.com/xiaochuanle/MECAT2/releases/download/20192026/mecat2_20190226_linuax_amd64.tar.gz
-$ tar xzvf mecat2_20190226_linuax_amd64.tar.gz
+	$ wget https://github.com/xiaochuanle/MECAT2/releases/download/20192026/mecat2_20190226_linuax_amd64.tar.gz
+	$ tar xzvf mecat2_20190226_linuax_amd64.tar.gz
 ###### 之后将主程序添加至环境变量里，例如我的 MECAT2 存放路径在 /home/my/software/MECAT2/
-$  export PATH=/home/my/software/MECAT2/Linux-amd64/bin:$PATH
+	$  export PATH=/home/my/software/MECAT2/Linux-amd64/bin:$PATH
 ###### 查看帮助
-$  mecat.pl
+	$  mecat.pl
 ###### 3.1) 数据格式
 ###### 目前MECAT2还不支持gz压缩文件，输入fastq或fasta
 ###### 3.2) 配置文件：https://www.jianshu.com/p/176fc8105000
-$ mecat.pl config ecoli_config_file.txt
+	$ mecat.pl config ecoli_config_file.txt
 ###### 使用vim修改ecoli_config_file.txt文件为config_file.txt
 ###### 3.3)  原始数据纠错
-$ mecat.pl correct config_file.txt
+	$ mecat.pl correct config_file.txt
 ###### 3.4)  对纠错后的reads进行组装
-$ mecat.pl assemble config_file.txt
+	$ mecat.pl assemble config_file.txt
 ###### 3.5)  结果解读
 ###### 纠错后的reads： 1-consensus/cns_reads.fasta.
 ###### 最长30/20X纠错后用于trimming的reads: 1-consensus/cns_final.fasta.
@@ -74,77 +74,77 @@ $ mecat.pl assemble config_file.txt
   ## 4.) NextDenovo assemble
 ###### NextDenovo软件安装
 ###### 下载已编译好的二进制版，可直接使用，无需安装。
-$  wget https://github.com/Nextomics/NextDenovo/releases/download/v2.1-beta.0/NextDenovo.tgz
-$  tar -vxzf NextDenovo.tgz
+	$  wget https://github.com/Nextomics/NextDenovo/releases/download/v2.1-beta.0/NextDenovo.tgz
+	$  tar -vxzf NextDenovo.tgz
 ###### 添加可执行权限
-$  cd NextDenovo
-$  chmod -R 755 *
+	$  cd NextDenovo
+	$  chmod -R 755 *
 ###### 添加至环境变量
-$  export PATH=~/software/NextDenovo/:$PATH
-$  export PATH=~/software/NextDenovo/bin/:$PATH
+	$  export PATH=~/software/NextDenovo/:$PATH
+	$  export PATH=~/software/NextDenovo/bin/:$PATH
 ###### 这时候没什么问题的话就可直接使用了
 ###### 软件运行需要python2.7，提示缺少模块时安装即可；但不支持python3
-$  nextDenovo -h
+	$  nextDenovo -h
 ###### 4.1)  在input.fofn中记录文件的实际位置
 ###### 4.2) 复制和修改配置文件：https://www.jianshu.com/p/fa26792435eb  http://blog.sciencenet.cn/blog-3406804-1204832.html
-$ cp ~/software/NextDenovo/doc/run.cfg ./
-$ vi run.cfg
+	$ cp ~/software/NextDenovo/doc/run.cfg ./
+	$ vi run.cfg
 ###### 4.3) 运行NextDenovo
-$ nextDenovo run.cfg
+	$ nextDenovo run.cfg
 ###### 对于NextDenovo最终的组装序列，可见：03.ctg_graph/01.ctg_graph.sh.work/ctg_graph00/nextgraph.assembly.contig.fasta
 
 
 
   ## 5.) wtdbg2 assemble
-$ conda activate canu
+	$ conda activate canu
 ###### 5.1) canu纠错
-$ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz
+	$ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz
 ###### Corrected reads saved in 'mtDNA.correctedReads.fasta.gz'.
 ###### 5.2) canu修整
-$ canu -trim -p mtDNA -d ./trim maxThreads=8 genomeSize=450k minReadLength=2000 minOverlapLength=500 -pacbio-corrected ./correct/mtDNA.correctedReads.fasta.gz
+	$ canu -trim -p mtDNA -d ./trim maxThreads=8 genomeSize=450k minReadLength=2000 minOverlapLength=500 -pacbio-corrected ./correct/mtDNA.correctedReads.fasta.gz
 ###### Trimmed reads saved in 'mtDNA.trimmedReads.fasta.gz'.
 ###### 5.3) 进行基因组装
 ###### 用canu trim校正之后的序列
-$ wtdbg2 -t 16 -i mtDNA.trimmedReads.fasta.gz -o prefix -L 5000
+	$ wtdbg2 -t 16 -i mtDNA.trimmedReads.fasta.gz -o prefix -L 5000
 ###### 5.4) 得到一致性序列
-$ wtpoa-cns -t 2 -i prefix.ctg.lay.gz -o prefix.ctg.lay.fa
+	$ wtpoa-cns -t 2 -i prefix.ctg.lay.gz -o prefix.ctg.lay.fa
 ###### 5.5) 利用三代reads的比对结果对基因组序列进行打磨修正
-$ minimap2 -t 2 -x map-pb -a prefix.ctg.lay.fa mtDNA.trimmedReads.fasta.gz | samtools view -Sb - > prefix.ctg.lay.map.bam
-$ samtools sort -o prefix.ctg.lay.map.sorted prefix.ctg.lay.map.bam
-$ samtools view prefix.ctg.lay.map.srt.bam | wtpoa-cns -t 2 -d prefix.ctg.lay.fa -i - -o prefix.ctg.lay.2nd.fa
+	$ minimap2 -t 2 -x map-pb -a prefix.ctg.lay.fa mtDNA.trimmedReads.fasta.gz | samtools view -Sb - > prefix.ctg.lay.map.bam
+	$ samtools sort -o prefix.ctg.lay.map.sorted prefix.ctg.lay.map.bam
+	$ samtools view prefix.ctg.lay.map.srt.bam | wtpoa-cns -t 2 -d prefix.ctg.lay.fa -i - -o prefix.ctg.lay.2nd.fa
 ###### 5.6) 最终组装结果是prefix.ctg.lay.2nd.fa
-$ less prefix.ctg.lay.2nd.fa | grep ">"
+	$ less prefix.ctg.lay.2nd.fa | grep ">"
 
 
 
   ## 6.) quickmerge assemble
 ###### 6.1) 一步法：运行一个py脚本
-$ merge_wrapper.py prefix.ctg.lay.2nd.fa  nextgraph.assembly.contig.fasta
+	$ merge_wrapper.py prefix.ctg.lay.2nd.fa  nextgraph.assembly.contig.fasta
 ###### ......
 ###### 结果是merged_out.fasta
 ###### 6.2) 分步运行（有时候：第3步-l报错，多试几次）
 ######  -l|minmatch 设置单个匹配的最小长度(默认20)。-p|prefix 设置输出文件的前缀(默认为out)
-$ nucmer -l 20 -p wtdbg2_nextDenovo prefix.ctg.lay.2nd.fa  nextgraph.assembly.contig.fasta
+	$ nucmer -l 20 -p wtdbg2_nextDenovo prefix.ctg.lay.2nd.fa  nextgraph.assembly.contig.fasta
 ######  -i float 设置最小对齐标识[0,100]，默认为0。-r  允许query overlaps（多对多）。-q 允许reference overlaps（多对多）
-$ delta-filter -i 5 -r -q wtdbg2_nextDenovo.delta > wtdbg2_nextDenovo.rq.delta
+	$ delta-filter -i 5 -r -q wtdbg2_nextDenovo.delta > wtdbg2_nextDenovo.rq.delta
 ###### 一般-l选择引用(-r)参考序列组装的N50作为初始值，quast计算。-ml一般大于5000。
-$ quickmerge -d wtdbg2_nextDenovo.rq.delta -q ./prefix.ctg.lay.2nd.fa -r ./nextgraph.assembly.contig.fasta -hco 5.0 -c 1.5 -l 34171 -ml 6000 -p wtdbg2_nextDenovo
+	$ quickmerge -d wtdbg2_nextDenovo.rq.delta -q ./prefix.ctg.lay.2nd.fa -r ./nextgraph.assembly.contig.fasta -hco 5.0 -c 1.5 -l 34171 -ml 6000 -p wtdbg2_nextDenovo
 ###### 结果是merged_wtdbg2_nextDenovo.fasta
 
 
 
   ## 7.) BLAST比对数据库，初步获取线粒体序列
-$ conda create blast blast -y
-$ conda activate blast
+	$ conda create blast blast -y
+	$ conda activate blast
 ###### 参考：http://blog.sciencenet.cn/blog-3406804-1199850.html
 ###### 需要用到本地版的NCBI核酸数据库（下文简称NT库），通过后续进行本地BLAST，在组装结果中挑选出比对到线粒体的contigs序列。
 ###### 将所有得到的contigs/scaffolds序列与NT库中收录的核酸序列做BLAST比对，定位目标序列。
 ###### 7.1) blastn 核酸比对，指定 NT 库路径，默认对每条序列输出一条最佳 hits 
-$ blastn -db /database/nt/nt -query ./configs.fasta -out blast -num_threads 4 -num_descriptions 1 -num_alignments 1 -dust no
+	$ blastn -db /database/nt/nt -query ./configs.fasta -out blast -num_threads 4 -num_descriptions 1 -num_alignments 1 -dust no
 ###### 7.2) 对blast结果格式作个转化，perl脚本获取链接：https://pan.baidu.com/s/1-HkUh_C9JgYH9q-J2R7ZDA
-$ perl blast_trans.pl spades_blast spades_blast.txt
+	$ perl blast_trans.pl spades_blast spades_blast.txt
 ###### 7.3) 根据注释描述，提取其中命中到“线粒体”的序列比对结果
-$ grep 'mitocho' blast.txt > blast.select.txt
+	$ grep 'mitocho' blast.txt > blast.select.txt
 ###### 7.4) 查看“blast.select.txt”，该文件中只保留了能够比对至数据库中已知线粒体序列的结果，即可大致确定哪些contigs序列是来自线粒体的。
 
 
@@ -157,23 +157,23 @@ $ grep 'mitocho' blast.txt > blast.select.txt
 ###### 能够实现该功能的工具有很多，可视化的工具如geneious，命令行工具如MUMmer，等等。
 ###### 8.1) 例如通过MUMmer共线性分析定位 contigs/scaffolds的顺序
 ###### 参考基因组序列要单一物种的，不要混合物种的
-$ conda create mummer mummer -y
-$ conda activate mummer
-$ mkdir mummer && cd mummer
-$ nucmer --mum -p mitochondria ref_NC_030753.1.fasta mtDNA.contigs.fasta
-$ delta-filter -m mitochondria.delta > mitochondria.filter
-$ show-coords -T -r -l mitochondria.filter > mitochondria.1coords
-$ mummerplot --postscript -p mitochondria mitochondria.delta
-$ ps2pdf mitochondria.ps mitochondria.pdf
+	$ conda create mummer mummer -y
+	$ conda activate mummer
+	$ mkdir mummer && cd mummer
+	$ nucmer --mum -p mitochondria ref_NC_030753.1.fasta mtDNA.contigs.fasta
+	$ delta-filter -m mitochondria.delta > mitochondria.filter
+	$ show-coords -T -r -l mitochondria.filter > mitochondria.1coords
+	$ mummerplot --postscript -p mitochondria mitochondria.delta
+	$ ps2pdf mitochondria.ps mitochondria.pdf
 ###### 对于共线性分析结果，可以直接查看文本结果文件“mitochondria.1coords”中的内容，记录了组装scaffolds序列和参考基因组序列的共线性匹配详细信息。或者更直观的，查看最后生成的共线性结果图，紫色/红色表示正向，蓝色表示反向。
 ###### 8.2) 依次提取序列--按照顺序组合得到tig_2.fasta
-$ samtools faidx mtDNA.contigs.fasta
-$ samtools faidx mtDNA.contigs.fasta tig00000011 > tig00000011.fa
-$ ......
+	$ samtools faidx mtDNA.contigs.fasta
+	$ samtools faidx mtDNA.contigs.fasta tig00000011 > tig00000011.fa
+	$ ......
 ###### 提取反向互补序列
-$ seqkit seq -t dna tig00000045.fa -r -p > tig00000045-RC.fa
+	$ seqkit seq -t dna tig00000045.fa -r -p > tig00000045-RC.fa
 ###### 组合不同的序列
-$ cat tig000000011.fa tig00000045-RC.fa tig00000044.fa tig00000009-RC.fa tig00000027-RC.fa tig00000030-RC.fa tig00000058-RC.fa tig00000032.fa tig00000029.fa tig00000046.fa tig00000018.fa tig00000068.fa tig00000040.fa tig00000050.fa tig00000062-RC.fa tig00000044-RC.fa tig00000024-RC.fa tig00000020.fa tig00000054.fa tig00000061-RC.fa tig00000019.fa tig00000009.fa tig00000044-RC.fa tig00000011.fa tig00000060.fa tig00000038-RC.fa tig00000021-RC.fa tig00000013-RC.fa tig00000043-RC.fa tig00000012.fa tig00000046-RC.fa tig00000035-RC.fa tig00000014-RC.fa > tig_2.fasta
+	$ cat tig000000011.fa tig00000045-RC.fa tig00000044.fa tig00000009-RC.fa tig00000027-RC.fa tig00000030-RC.fa tig00000058-RC.fa tig00000032.fa tig00000029.fa tig00000046.fa tig00000018.fa tig00000068.fa tig00000040.fa tig00000050.fa tig00000062-RC.fa tig00000044-RC.fa tig00000024-RC.fa tig00000020.fa tig00000054.fa tig00000061-RC.fa tig00000019.fa tig00000009.fa tig00000044-RC.fa tig00000011.fa tig00000060.fa tig00000038-RC.fa tig00000021-RC.fa tig00000013-RC.fa tig00000043-RC.fa tig00000012.fa tig00000046-RC.fa tig00000035-RC.fa tig00000014-RC.fa > tig_2.fasta
 ###### 8.3) 对tig_2.fasta重复步骤1，再次进行共线性分析
 
 
@@ -187,13 +187,13 @@ $ cat tig000000011.fa tig00000045-RC.fa tig00000044.fa tig00000009-RC.fa tig0000
 ###### 9.2) 运行
 ###### 首先创建配置文件 Protocol.xml
 ###### 然后依次运行下6步：
-$ Jelly.py setup Protocol.xml
-$ Jelly.py mapping Protocol.xml
-$ Jelly.py support Protocol.xml
-$ Jelly.py extraction Protocol.xml
-$ Jelly.py assembly Protocol.xml -x "--nproc=24"
-$ Jelly.py output Protocol.xml
+	$ Jelly.py setup Protocol.xml
+	$ Jelly.py mapping Protocol.xml
+	$ Jelly.py support Protocol.xml
+	$ Jelly.py extraction Protocol.xml
+	$ Jelly.py assembly Protocol.xml -x "--nproc=24"
+	$ Jelly.py output Protocol.xml
 ###### --nproc 参数设置运行线程数。
 ###### 输出结果文件为 jelly.out.fasta 。
 ###### 使用 PBJelly2 进行 scaffold 连接
-$ grep -Ho N jelly.out.fasta | uniq -c
+	$ grep -Ho N jelly.out.fasta | uniq -c
