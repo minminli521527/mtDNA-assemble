@@ -3,7 +3,7 @@
 
 
   ## 1.) canu assemble
-$ conda create -n canu canu -y
+$ conda create -n canu canu -y <br>
 $ conda activate canu
 ###### 1.1) correction
 ###### Parameter analysis：-p, specify the output prefix; -d specify the output result directory; genomeSize sets an estimated genome size, which is convenient for Canu to estimate the sequencing depth, the unit is g, m, k; maxThreads sets the maximum number of threads; minReadLength means only use the threshold value MinOverlapLength Set the minimum length of Overlap, increase minReadLength can increase the running speed, increase minOverlapLength can reduce the false positive overlap; In addition, you need to specify the type of input data, whether it is original sequencing data or processed (-pacbio-raw, Direct pacbio data obtained by direct sequencing; -pacbio-corrected corrected pacbio data; -nanopore-raw original nanopore data; -nanopore-corrected result corrected nanopore data); corOutCoverage: used to control how much data is used for error correction, for example, Arabidopsis thaliana is a 120M genome, and 12G data is obtained after 100X sequencing, if only the longest 6G data is to be used for error correction, then the parameter should be set to 50 (120m x 50), set a value greater than the sequencing depth , For example 120, means to use all data.
@@ -13,14 +13,15 @@ $ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength
 $ canu -trim -p mtDNA -d ./trim maxThreads=8 genomeSize=450k minReadLength=2000 minOverlapLength=500 -pacbio-corrected ./correct/mtDNA.correctedReads.fasta.gz
 ###### Trimmed reads saved in 'mtDNA.trimmedReads.fasta.gz'.
 ###### 1.3) assemble
-###### 这里需要调整纠错后的错误率， correctedErrorRate: 两个read交叠部分的差异程度的忍受程度，降低此值可以减少运行时间，如果覆盖率高的话，建议降低这个值，它会影响utgOvlErrorRate。这一步可以尝试多个参数，因为速度比较块。
+###### The error rate after error correction needs to be adjusted here. correctedErrorRate: the degree of tolerance of the difference between the overlapping parts of the two reads. Lowering this value can reduce the running time. If the coverage is high, it is recommended to reduce this value, it will affect utgOvlErrorRate. Multiple parameters can be tried in this step because of the speed comparison block.
 ###### error rate 0.035
 $ canu -assemble -p mtDNA -d ./assemble_0.035 maxThreads=20  genomeSize=450k correctedErrorRate=0.035 -pacbio-corrected ../mapping/mtDNA.trimmedReads_minimap2.fastq
-###### $ canu -assemble -p mtDNA -d ./assemble_0.035 maxThreads=20  genomeSize=450k errorRate=0.035 -pacbio-corrected ../mapping/mtDNA.trimmedReads_minimap2.fastq
-###### 最后输出文件下的mtDNA.contigs.fasta就是结果文件
+###### Different canu versions have different commands. If an error is reported, you may try the following command:
+$ canu -assemble -p mtDNA -d ./assemble_0.035 maxThreads=20  genomeSize=450k errorRate=0.035 -pacbio-corrected ../mapping/mtDNA.trimmedReads_minimap2.fastq
+###### The mtDNA.contigs.fasta under the final output file is the result file.
 ###### error rate 0.050
 $ canu -assemble -p mtDNA -d ./assemble_0.050 maxThreads=20  genomeSize=450k correctedErrorRate=0.050 -pacbio-corrected ../mapping/mtDNA.trimmedReads_minimap2.fastq
-###### 最后输出文件下的mtDNA.contigs.fasta就是结果文件
+###### The mtDNA.contigs.fasta under the final output file is the result file.
 
 
 
