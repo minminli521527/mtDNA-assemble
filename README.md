@@ -11,19 +11,16 @@
 	$ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz
 ###### Corrected reads saved in 'mtDNA.correctedReads.fasta.gz'.
 * ### 1.2) trim
-###### trim
-	$ canu -trim -p mtDNA -d ./trim maxThreads=8 genomeSize=450k minReadLength=2000 minOverlapLength=500 -pacbio-corrected ./correct/mtDNA.correctedReads.fasta.gz
 ###### Trimmed reads saved in 'mtDNA.trimmedReads.fasta.gz'.
+	$ canu -trim -p mtDNA -d ./trim maxThreads=8 genomeSize=450k minReadLength=2000 minOverlapLength=500 -pacbio-corrected ./correct/mtDNA.correctedReads.fasta.gz
 * ### 1.3) assemble
 ###### The error rate after error correction needs to be adjusted here. correctedErrorRate: the degree of tolerance of the difference between the overlapping parts of the two reads. Lowering this value can reduce the running time. If the coverage is high, it is recommended to reduce this value, it will affect utgOvlErrorRate. Multiple parameters can be tried in this step because of the speed comparison block.
 ###### error rate 0.035
 	$ canu -assemble -p mtDNA -d ./assemble_0.035 maxThreads=20  genomeSize=450k correctedErrorRate=0.035 -pacbio-corrected ../mapping/mtDNA.trimmedReads_minimap2.fastq
-###### Different canu versions have different commands. If an error is reported, you may try the following command:
+###### Different canu versions have different commands. If an error is reported, you may try the following command, and the mtDNA.contigs.fasta under the final output file is the result file.
 	$ canu -assemble -p mtDNA -d ./assemble_0.035 maxThreads=20  genomeSize=450k errorRate=0.035 -pacbio-corrected ../mapping/mtDNA.trimmedReads_minimap2.fastq
-###### The mtDNA.contigs.fasta under the final output file is the result file.
-###### error rate 0.050
+###### error rate 0.050, and the mtDNA.contigs.fasta under the final output file is the result file.
 	$ canu -assemble -p mtDNA -d ./assemble_0.050 maxThreads=20  genomeSize=450k correctedErrorRate=0.050 -pacbio-corrected ../mapping/mtDNA.trimmedReads_minimap2.fastq
-###### The mtDNA.contigs.fasta under the final output file is the result file.
 
 
 
@@ -34,17 +31,15 @@
 * ### 2.1) create input_fofn
 ###### input_fofn refers to the file containing the sequencing files name, each line must have the full path of the fasta file, and the file has been uploaded to this repository.
 * ### 2.2) create the configuration file
-###### the file fc_run.cfg has been uploaded to this repository.
-###### 配置文件fc_run.cfg最好是下载模板，进行修改，否则容易出错，配置文件控制着Falcon组装的各个阶段所用的参数，然而一开始我们并不知道哪一个参数才是最优的，通常都需要不断的调整才行。当然由于目前已经有比较多的物种使用了Falcon进行组装，所以可以从他们的配置文件中进行借鉴(https://pb-falcon.readthedocs.io/en/latest/parameters.html)
+###### The file fc_run.cfg has been uploaded to this repository.
+###### And, it is best to download the template of the configuration file file fc_run.cfg and then modify it, otherwise it is easy to make mistakes. The configuration file controls the parameters used in various stages of Falcon assembly. However, at the beginning, we did not know which parameter is the optimal one. Adjustment. Of course, since there are already many species using Falcon for assembly, they can learn from their configuration files (https://pb-falcon.readthedocs.io/en/latest/parameters.html).
 	$ wget https://pb-falcon.readthedocs.io/en/latest/_downloads/fc_run_ecoli_local.cfg
-###### 该文件的大部分内容都不需要修改，除了如下几个参数：input_fofn: 这里的input.fofn就是上一步创建的文件。建议把该文件放在cfg文件的同级目录下，这样子就不需要改配置文件该文件的路径了。genome_size,seed_coverage,length_cutoff,length-cutoff_pr 这三个参数控制纠错所用数据量和组装所用数据量. 如果要让程序在运行的时候自动确定用于纠错的数据量，就将length_cutoff设置成"-1"，同时设置基因组估计大小genome_size和用于纠错的深度seed_coverage。jobqueue: 这里用的是单主机而不是集群，所以其实随便取一个名字就行，但是对于SGE则要选择能够提交的队列名。xxx_concurrent_jobs: 同时运行的任务数。显然是越多越快，有些配置文件都写了192，但是对于大部分人而言是没有那么多资源资源的，盲目写多只会导致服务器宕机。
-* ### 2.3) 运行
+###### Most of the content of this file does not need to be modified, except for the following parameters. "input_fofn": the file input.fofn here is the file created in the previous step, it is recommended to put this file in the same directory of the configuration file, so that there is no need to change the path of the file in the configuration file. "genome_size", "seed_coverage", "length_cutoff", "length-cutoff_pr": these parameters control the amount of data used for error correction and the amount of data used for assembly, if you want the program to automatically determine the amount of data used for error correction when running, set "length_cutoff" to -1 ", set genome estimated size genome_size and depth seed_coverage for error correction at the same time. "jobqueue": here is a single host instead of a cluster, so in fact, just pick a name, but for SGE, you must choose the name of the queue that can be submitted. "xxx_concurrent_jobs": the number of jobs running at the same time is obviously more and faster, some configuration files have written 192, but for most people, there are not so many resources, blind writing more will only lead to server downtime.
+* ### 2.3) run
 ###### Falcon的运行非常简单，就是准备好配置文件传给fc_run.py，然后让fc_run.py调度所有需要的软件完成基因组组装即可。
 	$ fc_run.py fc_run_local.cfg
-###### 生成的最终主要结果文件为 2-asm-falcon/p_ctg.fa
-###### 0-rawreads/该目录存放对raw subreads进行overlpping分析与校正的结果；0-rawreads/cns-runs/cns_*/*/*.fasta存放校正后的序列信息；1-preads_ovl/该目录存放对校正后reads进行overlapping的结果；2-asm-falcon/该目录是最终结果目录，主要的结果文件是p_ctg.fa和a_ctg.fa
-
-
+###### The final main result file generated is 2-asm-falcon/p_ctg.fa
+###### 0-rawreads/: this directory stores the results of overlpping analysis and correction of raw subreads; 0-rawreads/cns-runs/cns_...*.fasta: stores the sequence information after correction; 1-preads_ovl/: this directory stores the overlaying of reads after correction The result; 2-asm-falcon/: this directory is the final result directory, the main result files are p_ctg.fa and a_ctg.fa.
 
 
 * ## 3) MECAT2 assemble  
