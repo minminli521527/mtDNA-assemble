@@ -2,7 +2,7 @@
 
 
 
-  ## 1.) canu assemble
+  * ## 1.) canu assemble
 $ conda create -n canu canu -y <br>
 $ conda activate canu
 #### 1.1) correction
