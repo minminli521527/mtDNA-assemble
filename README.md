@@ -31,9 +31,10 @@
 ###### Falcon software installation
 	$ conda create -n pb-assembly pb-assembly
 	$ conda activate pb-assembly
-* ### 2.1) 创建input_fofn
-###### FOFN指的是包含文件名的文件, 每一行里面都要有fasta文件的全路径:
-* ### 2.2) 创建配置文件
+* ### 2.1) create input_fofn
+###### input_fofn refers to the file containing the sequencing files name, each line must have the full path of the fasta file, and the file has been uploaded to this repository.
+* ### 2.2) create the configuration file
+###### the file fc_run.cfg has been uploaded to this repository.
 ###### 配置文件fc_run.cfg最好是下载模板，进行修改，否则容易出错，配置文件控制着Falcon组装的各个阶段所用的参数，然而一开始我们并不知道哪一个参数才是最优的，通常都需要不断的调整才行。当然由于目前已经有比较多的物种使用了Falcon进行组装，所以可以从他们的配置文件中进行借鉴(https://pb-falcon.readthedocs.io/en/latest/parameters.html)
 	$ wget https://pb-falcon.readthedocs.io/en/latest/_downloads/fc_run_ecoli_local.cfg
 ###### 该文件的大部分内容都不需要修改，除了如下几个参数：input_fofn: 这里的input.fofn就是上一步创建的文件。建议把该文件放在cfg文件的同级目录下，这样子就不需要改配置文件该文件的路径了。genome_size,seed_coverage,length_cutoff,length-cutoff_pr 这三个参数控制纠错所用数据量和组装所用数据量. 如果要让程序在运行的时候自动确定用于纠错的数据量，就将length_cutoff设置成"-1"，同时设置基因组估计大小genome_size和用于纠错的深度seed_coverage。jobqueue: 这里用的是单主机而不是集群，所以其实随便取一个名字就行，但是对于SGE则要选择能够提交的队列名。xxx_concurrent_jobs: 同时运行的任务数。显然是越多越快，有些配置文件都写了192，但是对于大部分人而言是没有那么多资源资源的，盲目写多只会导致服务器宕机。
