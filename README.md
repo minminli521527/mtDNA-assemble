@@ -3,6 +3,7 @@
 
 
 * ## 1) canu assemble
+###### canu software installation
 	$ conda create -n canu canu -y
 	$ conda activate canu
 * ### 1.1) correction
@@ -26,6 +27,7 @@
 
 
   ## 2.) Falcon assemble
+###### Falcon software installation
 $ conda create -n pb-assembly pb-assembly
 $ conda activate pb-assembly
 ###### 2.1) 创建input_fofn
