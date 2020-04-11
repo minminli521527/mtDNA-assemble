@@ -3,7 +3,7 @@
 
 
 * ## 1) canu assemble
-* ### 1.1) canu software installation
+* ### 1.1) 	canu software installation
 ###### use conda
 	$ conda create -n canu canu -y
 	$ conda activate canu
