@@ -13,10 +13,10 @@
 ###### Parameter analysis：-p, specify the output prefix; -d specify the output result directory; genomeSize sets an estimated genome size, which is convenient for Canu to estimate the sequencing depth, the unit is g, m, k; maxThreads sets the maximum number of threads; minReadLength means only use the threshold value MinOverlapLength Set the minimum length of Overlap, increase minReadLength can increase the running speed, increase minOverlapLength can reduce the false positive overlap; In addition, you need to specify the type of input data, whether it is original sequencing data or processed (-pacbio-raw, Direct pacbio data obtained by direct sequencing; -pacbio-corrected corrected pacbio data; -nanopore-raw original nanopore data; -nanopore-corrected result corrected nanopore data); corOutCoverage: used to control how much data is used for error correction, for example, Arabidopsis thaliana is a 120M genome, and 12G data is obtained after 100X sequencing, if only the longest 6G data is to be used for error correction, then the parameter should be set to 50 (120m x 50), set a value greater than the sequencing depth , for example 120, means to use all data.
 ###### Corrected reads saved in 'mtDNA.correctedReads.fasta.gz'.
  	$ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz
-	- * #### 1.2.2) trim
+- * #### 1.2.2) trim
 ###### Trimmed reads saved in 'mtDNA.trimmedReads.fasta.gz'.
   	$ canu -trim -p mtDNA -d ./trim maxThreads=8 genomeSize=450k minReadLength=2000 minOverlapLength=500 -pacbio-corrected ./correct/mtDNA.correctedReads.fasta.gz
-	- * #### 1.2.3) assemble
+- * #### 1.2.3) assemble
 ###### The error rate after error correction needs to be adjusted here. correctedErrorRate: the degree of tolerance of the difference between the overlapping parts of the two reads. Lowering this value can reduce the running time. If the coverage is high, it is recommended to reduce this value, it will affect utgOvlErrorRate. Multiple parameters can be tried in this step because of the speed comparison block.
 ###### error rate 0.035
   	$ canu -assemble -p mtDNA -d ./assemble_0.035 maxThreads=20  genomeSize=450k correctedErrorRate=0.035 -pacbio-corrected ../mapping/mtDNA.trimmedReads_minimap2.fastq
@@ -31,9 +31,9 @@
   	$  conda create -n pb-assembly pb-assembly
   	$  conda activate pb-assembly
 - * ### 2.2) repare data
-	- * #### 2.2.1) create input_fofn
+- * #### 2.2.1) create input_fofn
 ###### input_fofn refers to the file containing the sequencing files name, each line must have the full path of the fasta file, and the file has been uploaded to this repository.
-	- * #### 2.2.2) create the configuration file
+- * #### 2.2.2) create the configuration file
 ###### The file fc_run.cfg has been uploaded to this repository.
 ###### And, it is best to download the template of the configuration file file fc_run.cfg and then modify it, otherwise it is easy to make mistakes. The configuration file controls the parameters used in various stages of Falcon assembly. However, at the beginning, we did not know which parameter is the optimal one. Adjustment. Of course, since there are already many species using Falcon for assembly, they can learn from their configuration files (https://pb-falcon.readthedocs.io/en/latest/parameters.html).
 	$ wget https://pb-falcon.readthedocs.io/en/latest/_downloads/fc_run_ecoli_local.cfg
