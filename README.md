@@ -16,7 +16,7 @@
 - * #### 1.2.2) Trim
 ###### Trimmed reads saved in 'mtDNA.trimmedReads.fasta.gz'.
   	$ canu -trim -p mtDNA -d ./trim maxThreads=8 genomeSize=450k minReadLength=2000 minOverlapLength=500 -pacbio-corrected ./correct/mtDNA.correctedReads.fasta.gz
-- * #### 1.2.3) Assemble
+- * #### 1.2.3) Assemble using canu
 ###### The error rate after error correction needs to be adjusted here. correctedErrorRate: the degree of tolerance of the difference between the overlapping parts of the two reads. Lowering this value can reduce the running time. If the coverage is high, it is recommended to reduce this value, it will affect utgOvlErrorRate. Multiple parameters can be tried in this step because of the speed comparison block.
 ###### error rate 0.035
   	$ canu -assemble -p mtDNA -d ./assemble_0.035 maxThreads=20  genomeSize=450k correctedErrorRate=0.035 -pacbio-corrected ../mapping/mtDNA.trimmedReads_minimap2.fastq
@@ -45,7 +45,7 @@
 ###### 0-rawreads/: this directory stores the results of overlpping analysis and correction of raw subreads; 0-rawreads/cns-runs/cns_...*.fasta: stores the sequence information after correction; 1-preads_ovl/: this directory stores the overlaying of reads after correction The result; 2-asm-falcon/: this directory is the final result directory, the main result files are p_ctg.fa and a_ctg.fa.
 
 * ## 3) ECAT2 assemble
-###### Please refer to the URL for the process：http://blog.sciencenet.cn/blog-3406804-1203984.html
+###### Please refer to the URL for the process：http://blog.sciencenet.cn/blog-3406804-1203984.html.
 - * ### 3.1) MECAT2 software installation
 ###### Download the binary version directly.
 	$ wget https://github.com/xiaochuanle/MECAT2/releases/download/20192026/mecat2_20190226_linuax_amd64.tar.gz
@@ -58,18 +58,18 @@
 - * #### 3.2.1) Data format
 ###### Currently, MECAT2 does not support gz compressed files, enter fastq or fasta.
 - * #### 3.2.2) Configuration file：https://www.jianshu.com/p/176fc8105000
-###### Use vim to modify the ecoli_config_file.txt file to config_file.txt
+###### Using vim to modify the ecoli_config_file.txt file to config_file.txt.
 	$ mecat.pl config ecoli_config_file.txt
-- * ### 3.3) Assemble
-- * #### 3.3.1) Original data error correction
+- * ### 3.3) Assemble using MECAT2
+###### Original data error correction
 	$ mecat.pl correct config_file.txt
-- * #### 3.3.2) Assemble the corrected reads
+###### Assemble the corrected reads
 	$ mecat.pl assemble config_file.txt
 - * ### 3.4) Interpretation of results
 ###### Reads after error correction： 1-consensus/cns_reads.fasta.
 ###### Longest 30/20X error correction for trimming reads: 1-consensus/cns_final.fasta.
-###### Trimmed reads: 2-trim_bases/trimReads.fasta
-###### Assembled contigs: 4-fsa/contigs.fasta
+###### Trimmed reads: 2-trim_bases/trimReads.fasta.
+###### Assembled contigs: 4-fsa/contigs.fasta.
 
 
 
@@ -87,13 +87,15 @@
 ###### If there is no problem at this time, you can use it directly.
 ###### The software needs python2.7 to run, it can be installed when the module is missing, but does not support python3.
 	$  nextDenovo -h
-* ### 4.2)  在input.fofn中记录文件的实际位置
-* ### 4.3) 复制和修改配置文件：https://www.jianshu.com/p/fa26792435eb  http://blog.sciencenet.cn/blog-3406804-1204832.html
+- * ### 4.2) Prepare data
+###### Record the actual location of the file in input.fofn, the file has been uploaded to this repository.
+###### Copy and modify configuration files：https://www.jianshu.com/p/fa26792435eb  http://blog.sciencenet.cn/blog-3406804-1204832.html
 	$ cp ~/software/NextDenovo/doc/run.cfg ./
 	$ vi run.cfg
-* ### 4.4) 运行NextDenovo
+- * ### 4.3) Assemble using NextDenovo
+###### For the final assembly sequence of NextDenovo, could see:03.ctg_graph/01.ctg_graph.sh.work/ctg_graph00/nextgraph.assembly.contig.fasta
 	$ nextDenovo run.cfg
-###### 对于NextDenovo最终的组装序列，可见：03.ctg_graph/01.ctg_graph.sh.work/ctg_graph00/nextgraph.assembly.contig.fasta
+
 
 
 
