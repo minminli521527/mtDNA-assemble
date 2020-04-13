@@ -8,15 +8,15 @@
 	$ conda create -n canu canu -y
 	$ conda activate canu
 
-- * ### 1.2) assemble
-- * #### 1.2.1) correction
+- * ### 1.2) Assemble
+- * #### 1.2.1) Correction
 ###### Parameter analysis：-p, specify the output prefix; -d specify the output result directory; genomeSize sets an estimated genome size, which is convenient for Canu to estimate the sequencing depth, the unit is g, m, k; maxThreads sets the maximum number of threads; minReadLength means only use the threshold value MinOverlapLength Set the minimum length of Overlap, increase minReadLength can increase the running speed, increase minOverlapLength can reduce the false positive overlap; In addition, you need to specify the type of input data, whether it is original sequencing data or processed (-pacbio-raw, Direct pacbio data obtained by direct sequencing; -pacbio-corrected corrected pacbio data; -nanopore-raw original nanopore data; -nanopore-corrected result corrected nanopore data); corOutCoverage: used to control how much data is used for error correction, for example, Arabidopsis thaliana is a 120M genome, and 12G data is obtained after 100X sequencing, if only the longest 6G data is to be used for error correction, then the parameter should be set to 50 (120m x 50), set a value greater than the sequencing depth , for example 120, means to use all data.
 ###### Corrected reads saved in 'mtDNA.correctedReads.fasta.gz'.
  	$ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz
-- * #### 1.2.2) trim
+- * #### 1.2.2) Trim
 ###### Trimmed reads saved in 'mtDNA.trimmedReads.fasta.gz'.
   	$ canu -trim -p mtDNA -d ./trim maxThreads=8 genomeSize=450k minReadLength=2000 minOverlapLength=500 -pacbio-corrected ./correct/mtDNA.correctedReads.fasta.gz
-- * #### 1.2.3) assemble
+- * #### 1.2.3) Assemble
 ###### The error rate after error correction needs to be adjusted here. correctedErrorRate: the degree of tolerance of the difference between the overlapping parts of the two reads. Lowering this value can reduce the running time. If the coverage is high, it is recommended to reduce this value, it will affect utgOvlErrorRate. Multiple parameters can be tried in this step because of the speed comparison block.
 ###### error rate 0.035
   	$ canu -assemble -p mtDNA -d ./assemble_0.035 maxThreads=20  genomeSize=450k correctedErrorRate=0.035 -pacbio-corrected ../mapping/mtDNA.trimmedReads_minimap2.fastq
@@ -30,15 +30,15 @@
 ###### using conda
   	$  conda create -n pb-assembly pb-assembly
   	$  conda activate pb-assembly
-- * ### 2.2) repare data
-- * #### 2.2.1) create input_fofn
+- * ### 2.2) Prepare data
+- * #### 2.2.1) Create input_fofn
 ###### The file input_fofn refers to the file containing the sequencing files name, each line must have the full path of the fasta file, and the file has been uploaded to this repository.
-- * #### 2.2.2) create the configuration file
+- * #### 2.2.2) Create the configuration file
 ###### The file fc_run.cfg has been uploaded to this repository.
 ###### And, it is best to download the template of the configuration file file fc_run.cfg and then modify it, otherwise it is easy to make mistakes. The configuration file controls the parameters used in various stages of Falcon assembly. However, at the beginning, we did not know which parameter is the optimal one. Adjustment. Of course, since there are already many species using Falcon for assembly, they can learn from their configuration files (https://pb-falcon.readthedocs.io/en/latest/parameters.html).
 	$ wget https://pb-falcon.readthedocs.io/en/latest/_downloads/fc_run_ecoli_local.cfg
 ###### Most of the content of this file does not need to be modified, except for the following parameters. "input_fofn": the file input.fofn here is the file created in the previous step, it is recommended to put this file in the same directory of the configuration file, so that there is no need to change the path of the file in the configuration file. "genome_size", "seed_coverage", "length_cutoff", "length-cutoff_pr": these parameters control the amount of data used for error correction and the amount of data used for assembly, if you want the program to automatically determine the amount of data used for error correction when running, set "length_cutoff" to -1 ", set genome estimated size genome_size and depth seed_coverage for error correction at the same time. "jobqueue": here is a single host instead of a cluster, so in fact, just pick a name, but for SGE, you must choose the name of the queue that can be submitted. "xxx_concurrent_jobs": the number of jobs running at the same time is obviously more and faster, some configuration files have written 192, but for most people, there are not so many resources, blind writing more will only lead to server downtime.
-- * ### 2.3) assemble
+- * ### 2.3) Assemble
 ###### Running Falcon is very simple, just prepare the configuration file and pass it to fc_run.py, and then let fc_run.py schedule all the required software to complete the genome assembly.
 	$ fc_run.py fc_run_local.cfg
 ###### The final main result file generated is 2-asm-falcon/p_ctg.fa
@@ -54,16 +54,18 @@
 	$  export PATH=/home/my/software/MECAT2/Linux-amd64/bin:$PATH
 ###### View help
 	$  mecat.pl
-- * ### 3.2) 数据格式
+- * ### 3.2) Prepare data
+- * #### 3.2.1) Data format
 ###### Currently, MECAT2 does not support gz compressed files, enter fastq or fasta.
-- * ### 3.3) Configuration file：https://www.jianshu.com/p/176fc8105000
-	$ mecat.pl config ecoli_config_file.txt
+- * #### 3.2.2) Configuration file：https://www.jianshu.com/p/176fc8105000
 ###### Use vim to modify the ecoli_config_file.txt file to config_file.txt
-- * ### 3.4) Original data error correction
+	$ mecat.pl config ecoli_config_file.txt
+- * ### 3.3) Assemble
+- * #### 3.3.1) Original data error correction
 	$ mecat.pl correct config_file.txt
-- * ### 3.5) Assemble the corrected reads
+- * #### 3.3.2) Assemble the corrected reads
 	$ mecat.pl assemble config_file.txt
-- * ### 3.6) Interpretation of results
+- * ### 3.4) Interpretation of results
 ###### Reads after error correction： 1-consensus/cns_reads.fasta.
 ###### Longest 30/20X error correction for trimming reads: 1-consensus/cns_final.fasta.
 ###### Trimmed reads: 2-trim_bases/trimReads.fasta
