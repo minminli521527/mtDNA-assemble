@@ -104,38 +104,44 @@
 ###### using conda
 	$ conda activate canu
 * ### 5.2) Assemble using wtdbg2
-######	 5.2.1) Correction using canu
+###### Correction using canu
 ###### Corrected reads saved in 'mtDNA.correctedReads.fasta.gz'.
 	$ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz
-######	 5.2.2) Trim using canu
+###### Trim using canu
 ###### Trimmed reads saved in 'mtDNA.trimmedReads.fasta.gz'.
 	$ canu -trim -p mtDNA -d ./trim maxThreads=8 genomeSize=450k minReadLength=2000 minOverlapLength=500 -pacbio-corrected ./correct/mtDNA.correctedReads.fasta.gz
-###### 5.2.3) Assemble using wtdbg2
+###### Assemble using wtdbg2
 ###### Corrected sequence with canu.
 	$ wtdbg2 -t 16 -i mtDNA.trimmedReads.fasta.gz -o prefix -L 5000
-* ### 5.4) 得到一致性序列
+###### Get consensus sequence
 	$ wtpoa-cns -t 2 -i prefix.ctg.lay.gz -o prefix.ctg.lay.fa
-* ### 5.5) 利用三代reads的比对结果对基因组序列进行打磨修正
+###### Polish and modify the genome sequence using three-generation sequencing reads. 
 	$ minimap2 -t 2 -x map-pb -a prefix.ctg.lay.fa mtDNA.trimmedReads.fasta.gz | samtools view -Sb - > prefix.ctg.lay.map.bam
 	$ samtools sort -o prefix.ctg.lay.map.sorted prefix.ctg.lay.map.bam
 	$ samtools view prefix.ctg.lay.map.srt.bam | wtpoa-cns -t 2 -d prefix.ctg.lay.fa -i - -o prefix.ctg.lay.2nd.fa
-* ### 5.6) 最终组装结果是prefix.ctg.lay.2nd.fa
+###### The final assembly result is: prefix.ctg.lay.2nd.fa
 	$ less prefix.ctg.lay.2nd.fa | grep ">"
 
 
-* ## 6) quickmerge assemble
-* ### 6.1) 一步法：运行一个py脚本
+
+* ## 6) Quickmerge the assembly results of different software
+* ### 6.1) Quickmerge software installation
+
+
+* ### 6.2) Assemble using Quickmerge-method 1
+###### One-step method: run a py script
+###### The result is merged_out.fasta
+###### Make pairwise comparisons many times to get the final result.
 	$ merge_wrapper.py prefix.ctg.lay.2nd.fa  nextgraph.assembly.contig.fasta
-###### ......
-###### 结果是merged_out.fasta
-* ### 6.2) 分步运行（有时候：第3步-l报错，多试几次）
-######  -l|minmatch 设置单个匹配的最小长度(默认20)。-p|prefix 设置输出文件的前缀(默认为out)
+* ### 6.3) Assemble using Quickmerge-method 2
+###### Run in steps
+######  -l|minmatch: set the minimum length of a single match (default 20). -p|prefix: set the prefix of the output file (default is out).
 	$ nucmer -l 20 -p wtdbg2_nextDenovo prefix.ctg.lay.2nd.fa  nextgraph.assembly.contig.fasta
-######  -i float 设置最小对齐标识[0,100]，默认为0。-r  允许query overlaps（多对多）。-q 允许reference overlaps（多对多）
+######  -i float: set the minimum alignment mark [0,100], the default is 0. -r: allows query overlaps (many to many). -q: allows reference overlaps (many to many)
 	$ delta-filter -i 5 -r -q wtdbg2_nextDenovo.delta > wtdbg2_nextDenovo.rq.delta
-###### 一般-l选择引用(-r)参考序列组装的N50作为初始值，quast计算。-ml一般大于5000。
+###### In general, -l selects the N50 assembled from the reference (-r) sequence as the initial value, and calculates it using quast. -ml is generally greater than 5000. Sometimes it gives an error, try a few more times.
+###### The result is merged_wtdbg2_nextDenovo.fasta
 	$ quickmerge -d wtdbg2_nextDenovo.rq.delta -q ./prefix.ctg.lay.2nd.fa -r ./nextgraph.assembly.contig.fasta -hco 5.0 -c 1.5 -l 34171 -ml 6000 -p wtdbg2_nextDenovo
-###### 结果是merged_wtdbg2_nextDenovo.fasta
 
 
 
