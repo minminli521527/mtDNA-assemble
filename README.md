@@ -100,15 +100,17 @@
 
 
 * ## 5) wtdbg2 assemble
+* ### 5.1) wtdbg2 software installation
 	$ conda activate canu
-* ### 5.1) canu纠错
-	$ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz
+* ### 5.2) Assemble using wtdbg2
+###### 5.2.1) Correction using canu
 ###### Corrected reads saved in 'mtDNA.correctedReads.fasta.gz'.
-* ### 5.2) canu修整
-	$ canu -trim -p mtDNA -d ./trim maxThreads=8 genomeSize=450k minReadLength=2000 minOverlapLength=500 -pacbio-corrected ./correct/mtDNA.correctedReads.fasta.gz
+	$ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz
+###### 5.2.2) Trim using canu
 ###### Trimmed reads saved in 'mtDNA.trimmedReads.fasta.gz'.
-* ### 5.3) 进行基因组装
-###### 用canu trim校正之后的序列
+	$ canu -trim -p mtDNA -d ./trim maxThreads=8 genomeSize=450k minReadLength=2000 minOverlapLength=500 -pacbio-corrected ./correct/mtDNA.correctedReads.fasta.gz
+###### 5.2.3) Assemble using wtdbg2
+###### Corrected sequence with canu.
 	$ wtdbg2 -t 16 -i mtDNA.trimmedReads.fasta.gz -o prefix -L 5000
 * ### 5.4) 得到一致性序列
 	$ wtpoa-cns -t 2 -i prefix.ctg.lay.gz -o prefix.ctg.lay.fa
