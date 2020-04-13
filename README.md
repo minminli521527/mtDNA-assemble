@@ -4,7 +4,7 @@
 
 * ## 1) canu assemble
 - * ### 1.1) canu software installation
-###### use conda
+	###### use conda
 ```javascript
 	$ conda create -n canu canu -y
 	$ conda activate canu
