@@ -98,14 +98,17 @@
 
 
 
-
 * ## 5) wtdbg2 assemble
 * ### 5.1) wtdbg2 software installation
 ###### using conda
-	$ conda activate canu
+	$ conda create -n wtdbg
+	$ conda install wtdbg -y
+	$ conda activate wtdbg
+	$ wtdbg2
 * ### 5.2) Assemble using wtdbg2
 ###### Correction using canu
 ###### Corrected reads saved in 'mtDNA.correctedReads.fasta.gz'.
+	$ conda activate canu
 	$ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz
 ###### Trim using canu
 ###### Trimmed reads saved in 'mtDNA.trimmedReads.fasta.gz'.
@@ -126,8 +129,11 @@
 
 * ## 6) Quickmerge the assembly results of different software
 * ### 6.1) Quickmerge software installation
-
-
+###### using conda
+	$ conda create -n quickmerge
+	$ conda install -c conda-forge -c bioconda quickmerge
+	$ conda activatequickmerge
+	$ merge_wrapper.py
 * ### 6.2) Assemble using Quickmerge-method 1
 ###### One-step method: run a py script
 ###### The result is merged_out.fasta
@@ -135,11 +141,11 @@
 	$ merge_wrapper.py prefix.ctg.lay.2nd.fa  nextgraph.assembly.contig.fasta
 * ### 6.3) Assemble using Quickmerge-method 2
 ###### Run in steps
-######  -l|minmatch: set the minimum length of a single match (default 20). -p|prefix: set the prefix of the output file (default is out).
+######  Parameter analysis：-l|minmatch: set the minimum length of a single match (default 20). -p|prefix: set the prefix of the output file (default is out).
 	$ nucmer -l 20 -p wtdbg2_nextDenovo prefix.ctg.lay.2nd.fa  nextgraph.assembly.contig.fasta
-######  -i float: set the minimum alignment mark [0,100], the default is 0. -r: allows query overlaps (many to many). -q: allows reference overlaps (many to many)
+######  Parameter analysis：-i float: set the minimum alignment mark [0,100], the default is 0. -r: allows query overlaps (many to many). -q: allows reference overlaps (many to many)
 	$ delta-filter -i 5 -r -q wtdbg2_nextDenovo.delta > wtdbg2_nextDenovo.rq.delta
-###### In general, -l selects the N50 assembled from the reference (-r) sequence as the initial value, and calculates it using quast. -ml is generally greater than 5000. Sometimes it gives an error, try a few more times.
+###### Parameter analysis：In general, -l selects the N50 assembled from the reference (-r) sequence as the initial value, and calculates it using quast. -ml is generally greater than 5000. Sometimes it gives an error, try a few more times.
 ###### The result is merged_wtdbg2_nextDenovo.fasta
 	$ quickmerge -d wtdbg2_nextDenovo.rq.delta -q ./prefix.ctg.lay.2nd.fa -r ./nextgraph.assembly.contig.fasta -hco 5.0 -c 1.5 -l 34171 -ml 6000 -p wtdbg2_nextDenovo
 
@@ -190,22 +196,23 @@
 
 
 
-* ## 9) PBJelly2用于利用Pacbio数据进行基因组补洞和scaffold连接
-###### 如果上一步并未完全将线粒体基因组环起来，中间还存在gap，那么这一部分的内容将会是有用的。
-* ### 9.1) PBJelly2软件安装
-###### 按照步骤：https://sr-c.github.io/2019/07/02/PBJelly-and-blasr-installation/，安装PBJelly2，同时借鉴步骤：http://cache.baiducontent.com/c?m=9f65cb4a8c8507ed4fece763105392230e54f73266808c4b2487cf1cd4735b36163bbca63023644280906b6677ed1a0dbaab6b66725e60e1948ad8128ae5cc6338895734&p=c363c64ad4d914f306bd9b78084d&newp=8f73c64ad48811a05ee8c6365f4492695d0fc20e38d3d701298ffe0cc4241a1a1a3aecbf2d211301d7c47f6006a54359e9fb30703d0034f1f689df08d2ecce7e64&user=baidu&fm=sc&query=pbjelly2&qid=e4e870de000cfaa0&p1=9，安装PBJelly2软件。
+* ## 9) Genomic hole filling and scaffold connection
+###### Using PBJelly2, and Pacbio reads
+###### If the previous step did not completely loop the mitochondrial genome and there is a gap in the middle, then this part of the content will be useful.
+* ### 9.1) PBJelly2 software installation
+###### Follow the steps to install PBJelly2: https://sr-c.github.io/2019/07/02/PBJelly-and-blasr-installation/，http://cache.baiducontent.com/c?m=9f65cb4a8c8507ed4fece763105392230e54f73266808c4b2487cf1cd4735b36163bbca63023644280906b6677ed1a0dbaab6b66725e60e1948ad8128ae5cc6338895734&p=c363c64ad4d914f306bd9b78084d&newp=8f73c64ad48811a05ee8c6365f4492695d0fc20e38d3d701298ffe0cc4241a1a1a3aecbf2d211301d7c47f6006a54359e9fb30703d0034f1f689df08d2ecce7e64&user=baidu&fm=sc&query=pbjelly2&qid=e4e870de000cfaa0&p1=9 .
 ###### 特别注意：需要在python2.7环境运行，否则报错.py，##行
 ###### 特别注意：conda install networkx==1.11
-* ### 9.2) 运行
-###### 首先创建配置文件 Protocol.xml
-###### 然后依次运行下6步：
+* ### 9.2) Run
+###### First create the configuration file Protocol.xml.
+###### Then run the next 6 steps in sequence:
 	$ Jelly.py setup Protocol.xml
 	$ Jelly.py mapping Protocol.xml
 	$ Jelly.py support Protocol.xml
 	$ Jelly.py extraction Protocol.xml
 	$ Jelly.py assembly Protocol.xml -x "--nproc=24"
 	$ Jelly.py output Protocol.xml
-###### --nproc 参数设置运行线程数。
-###### 输出结果文件为 jelly.out.fasta 。
-###### 使用 PBJelly2 进行 scaffold 连接
+###### The --nproc parameter sets the number of running threads.
+###### The output file is jelly.out.fasta.
+###### For scaffold connection, using PBJelly2.
 	$ grep -Ho N jelly.out.fasta | uniq -c
