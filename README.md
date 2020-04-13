@@ -171,15 +171,6 @@
 
 
 
-* ## 8) contigs的定位和定向
-###### 需要结合手动过程
-###### 经过初步拼接后，获得了几个组装结果fasta文件。这些fasta文件中通常存在多条contigs/scaffolds序列（仅凭软件自动组装得到一整条序列，几乎不太可能），下一步就需要确定这些contigs/scaffolds序列在基因组中的相对位置和方向（定位和定向），以继续往完整的环状线粒体基因组序列搭建。
-###### 这一步也需借助参考基因组来完成。将组装得到的那些contigs/scaffolds序列与参考基因组对齐，确定位置和方向关系。
-###### BLAST比对结果中，给出了这些contigs/scaffolds序列最佳命中的参考线粒体基因组序列名称。可以从中找一条最相似的参考基因组，通过ID在NCBI或EMBL等数据库中下载它们，辅助我们确定这些contigs/scaffolds序列在基因组中的相对位置和方向（定位和定向）。此外，参考基因组还能帮助我们确定自己线粒体基因组的最终长度范围。
-###### 能够实现该功能的工具有很多，可视化的工具如geneious，命令行工具如MUMmer，等等。
-* ### 8.1) 例如通过MUMmer共线性分析定位 contigs/scaffolds的顺序
-###### 参考基因组序列要单一物种的，不要混合物种的
-
 * ## 8) Contigs positioning and orientation
 ###### Need to combine manual process
 ###### After preliminary splicing, several assembly result fasta files were obtained. There are usually multiple contigs/scaffolds sequences in these fasta files (the whole sequence is only automatically assembled by software, which is almost impossible), the next step is to determine the relative position and orientation of these contigs/scaffolds sequences in the genome to continue to build up the complete circular mitochondrial genome sequence.
