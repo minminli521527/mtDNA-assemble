@@ -101,12 +101,13 @@
 
 * ## 5) wtdbg2 assemble
 * ### 5.1) wtdbg2 software installation
+###### using conda
 	$ conda activate canu
 * ### 5.2) Assemble using wtdbg2
-###### 5.2.1) Correction using canu
+######	 5.2.1) Correction using canu
 ###### Corrected reads saved in 'mtDNA.correctedReads.fasta.gz'.
 	$ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz
-###### 5.2.2) Trim using canu
+######	 5.2.2) Trim using canu
 ###### Trimmed reads saved in 'mtDNA.trimmedReads.fasta.gz'.
 	$ canu -trim -p mtDNA -d ./trim maxThreads=8 genomeSize=450k minReadLength=2000 minOverlapLength=500 -pacbio-corrected ./correct/mtDNA.correctedReads.fasta.gz
 ###### 5.2.3) Assemble using wtdbg2
