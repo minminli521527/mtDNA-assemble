@@ -179,6 +179,16 @@
 ###### 能够实现该功能的工具有很多，可视化的工具如geneious，命令行工具如MUMmer，等等。
 * ### 8.1) 例如通过MUMmer共线性分析定位 contigs/scaffolds的顺序
 ###### 参考基因组序列要单一物种的，不要混合物种的
+
+* ## 8) Contigs positioning and orientation
+###### Need to combine manual process
+###### After preliminary splicing, several assembly result fasta files were obtained. There are usually multiple contigs/scaffolds sequences in these fasta files (the whole sequence is only automatically assembled by software, which is almost impossible), the next step is to determine the relative position and orientation of these contigs/scaffolds sequences in the genome to continue to build up the complete circular mitochondrial genome sequence.
+###### This step also needs to be done with the help of the reference genome. Align those assembled contigs / scaffolds sequences with the reference genome to determine the position and orientation relationship.
+###### BLAST alignment results give the name of the reference mitochondrial genome sequence that best hits these contigs / scaffolds sequences. You can find one of the most similar reference genomes and download them in databases such as NCBI or EMBL by ID to help us determine the relative position and orientation (location and orientation) of these contigs / scaffolds sequences in the genome. In addition, the reference genome can also help us determine the final length range of our mitochondrial genome.
+###### There are many tools that can achieve this function, visualization tools such as geneious, command-line tools such as MUMmer, and so on.
+* ### 8.1) Collinear analysis
+###### For example, use MUMmer for collinear analysis and positioning to determine the order of contigs / scaffolds
+###### Reference genome sequence should be single species, not mixed species
 	$ conda create mummer mummer -y
 	$ conda activate mummer
 	$ mkdir mummer && cd mummer
@@ -188,7 +198,8 @@
 	$ mummerplot --postscript -p mitochondria mitochondria.delta
 	$ ps2pdf mitochondria.ps mitochondria.pdf
 ###### For the results of collinearity analysis, could directly view the content in the text result file "mitochondria.1coords" and record the details of collinearity matching of the assembled scaffolds sequence and the reference genome sequence. Or more intuitively, view the resulting collinearity result graph, where purple/red indicates forward and blue indicates reverse.
-* ### 8.2) Extract sequences in sequence--combine tig_2.fasta in order.
+* ### 8.2) Extract sequences in sequence
+###### combine tig_2.fasta in order.
 	$ samtools faidx mtDNA.contigs.fasta
 	$ samtools faidx mtDNA.contigs.fasta tig00000011 > tig00000011.fa
 	$ ......
