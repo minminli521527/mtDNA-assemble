@@ -151,19 +151,23 @@
 
 
 
-* ## 7) Alignment database BLAST, preliminary acquisition of mitochondrial sequences.
+* ## 7) Preliminary mitochondrial sequence
+###### Alignment database BLAST
+* ### 7.1) BLAST software installation
+###### using conda
 	$ conda create blast blast -y
 	$ conda activate blast
+* ### 7.2) Blast
 ###### Reference: http://blog.sciencenet.cn/blog-3406804-1199850.html
 ###### A local version of the NCBI nucleic acid database (hereinafter referred to as NT library) is required. Through subsequent local BLAST, the contigs sequences that are aligned to the mitochondria are selected from the assembly results.
 ###### Perform BLAST alignment of all the contigs/scaffolds sequences and the nucleic acid sequences included in the NT library to locate the target sequence.
-* ### 7.1) Nucleic acid comparison-blastn，specify the NT library path, and output the best hits for each sequence by default.
+###### Nucleic acid comparison-blastn，specify the NT library path, and output the best hits for each sequence by default.
 	$ blastn -db /database/nt/nt -query ./configs.fasta -out blast -num_threads 4 -num_descriptions 1 -num_alignments 1 -dust no
-* ### 7.2) Transform the blast result format, get the link of the perl script: https://pan.baidu.com/s/1-HkUh_C9JgYH9q-J2R7ZDA
+###### Transform the blast result format, get the link of the perl script: https://pan.baidu.com/s/1-HkUh_C9JgYH9q-J2R7ZDA
 	$ perl blast_trans.pl spades_blast spades_blast.txt
-* ### 7.3) According to the description of the annotation, extract the result of sequence alignment that hits "mitochondria".
+###### According to the description of the annotation, extract the result of sequence alignment that hits "mitochondria".
 	$ grep 'mitocho' blast.txt > blast.select.txt
-* ### 7.4) View "blast.select.txt", only the results of known mitochondrial sequences that can be compared to the database are retained in this file, which can roughly determine which contigs are derived from mitochondria.
+###### View "blast.select.txt", only the results of known mitochondrial sequences that can be compared to the database are retained in this file, which can roughly determine which contigs are derived from mitochondria.
 
 
 
