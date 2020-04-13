@@ -11,7 +11,7 @@
 ```
 
 - * ### 1.2) assemble
-		- * #### 1.2.1) correction
+	- * #### 1.2.1) correction
 	###### Parameter analysis：-p, specify the output prefix; -d specify the output result directory; genomeSize sets an estimated genome size, which is convenient for Canu to estimate the sequencing depth, the unit is g, m, k; maxThreads sets the maximum number of threads; minReadLength means only use the threshold value MinOverlapLength Set the minimum length of Overlap, increase minReadLength can increase the running speed, increase minOverlapLength can reduce the false positive overlap; In addition, you need to specify the type of input data, whether it is original sequencing data or processed (-pacbio-raw, Direct pacbio data obtained by direct sequencing; -pacbio-corrected corrected pacbio data; -nanopore-raw original nanopore data; -nanopore-corrected result corrected nanopore data); corOutCoverage: used to control how much data is used for error correction, for example, Arabidopsis thaliana is a 120M genome, and 12G data is obtained after 100X sequencing, if only the longest 6G data is to be used for error correction, then the parameter should be set to 50 (120m x 50), set a value greater than the sequencing depth , for example 120, means to use all data.
 	$ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz
 ###### Corrected reads saved in 'mtDNA.correctedReads.fasta.gz'.
