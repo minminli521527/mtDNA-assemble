@@ -14,7 +14,7 @@
 ###### Corrected reads saved in 'mtDNA.correctedReads.fasta.gz'.
 	$ canu -correct -p mtDNA -d ./correct maxThreads=4 genomeSize=450k minReadLength=2000 minOverlapLength=500 corOutCoverage=120 corMinCoverage=2 -pacbio-raw ../data/mtDNA.fastq.gz <br>
 	
-	- * #### 1.2.2) trim
+	\- * #### 1.2.2) trim
 ###### Trimmed reads saved in 'mtDNA.trimmedReads.fasta.gz'.
 	$ canu -trim -p mtDNA -d ./trim maxThreads=8 genomeSize=450k minReadLength=2000 minOverlapLength=500 -pacbio-corrected ./correct/mtDNA.correctedReads.fasta.gz
 
