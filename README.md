@@ -27,12 +27,12 @@
 
 * ## 2) Falcon assemble
 - * ### 2.1) Falcon software installation
-###### use conda
+###### using conda
   	$  conda create -n pb-assembly pb-assembly
   	$  conda activate pb-assembly
 - * ### 2.2) repare data
 - * #### 2.2.1) create input_fofn
-###### input_fofn refers to the file containing the sequencing files name, each line must have the full path of the fasta file, and the file has been uploaded to this repository.
+###### The file input_fofn refers to the file containing the sequencing files name, each line must have the full path of the fasta file, and the file has been uploaded to this repository.
 - * #### 2.2.2) create the configuration file
 ###### The file fc_run.cfg has been uploaded to this repository.
 ###### And, it is best to download the template of the configuration file file fc_run.cfg and then modify it, otherwise it is easy to make mistakes. The configuration file controls the parameters used in various stages of Falcon assembly. However, at the beginning, we did not know which parameter is the optimal one. Adjustment. Of course, since there are already many species using Falcon for assembly, they can learn from their configuration files (https://pb-falcon.readthedocs.io/en/latest/parameters.html).
@@ -47,43 +47,43 @@
 * ## 3) ECAT2 assemble
 ###### Please refer to the URL for the process：http://blog.sciencenet.cn/blog-3406804-1203984.html
 - * ### 3.1) MECAT2 software installation
-###### download the binary version directly
+###### Download the binary version directly.
 	$ wget https://github.com/xiaochuanle/MECAT2/releases/download/20192026/mecat2_20190226_linuax_amd64.tar.gz
 	$ tar xzvf mecat2_20190226_linuax_amd64.tar.gz
-###### 之后将主程序添加至环境变量里，例如我的 MECAT2 存放路径在 /home/my/software/MECAT2/
+###### Then add the main program to the environment variables, for example, my MECAT2 storage path is in /home/my/software/MECAT2/.
 	$  export PATH=/home/my/software/MECAT2/Linux-amd64/bin:$PATH
-###### 查看帮助
+###### View help
 	$  mecat.pl
 - * ### 3.2) 数据格式
-###### 目前MECAT2还不支持gz压缩文件，输入fastq或fasta
-- * ### 3.3) 配置文件：https://www.jianshu.com/p/176fc8105000
+###### Currently, MECAT2 does not support gz compressed files, enter fastq or fasta.
+- * ### 3.3) Configuration file：https://www.jianshu.com/p/176fc8105000
 	$ mecat.pl config ecoli_config_file.txt
-###### 使用vim修改ecoli_config_file.txt文件为config_file.txt
-- * ### 3.4) 原始数据纠错
+###### Use vim to modify the ecoli_config_file.txt file to config_file.txt
+- * ### 3.4) Original data error correction
 	$ mecat.pl correct config_file.txt
-- * ### 3.5) 对纠错后的reads进行组装
+- * ### 3.5) Assemble the corrected reads
 	$ mecat.pl assemble config_file.txt
-- * ### 3.6) 结果解读
-###### 纠错后的reads： 1-consensus/cns_reads.fasta.
-###### 最长30/20X纠错后用于trimming的reads: 1-consensus/cns_final.fasta.
-###### trimmed reads: 2-trim_bases/trimReads.fasta
-###### 组装的contigs: 4-fsa/contigs.fasta
+- * ### 3.6) Interpretation of results
+###### Reads after error correction： 1-consensus/cns_reads.fasta.
+###### Longest 30/20X error correction for trimming reads: 1-consensus/cns_final.fasta.
+###### Trimmed reads: 2-trim_bases/trimReads.fasta
+###### Assembled contigs: 4-fsa/contigs.fasta
 
 
 
 * ## 4) NextDenovo assemble
 * ### 4.1) NextDenovo software installation
-###### 下载已编译好的二进制版，可直接使用，无需安装。
+###### Download the compiled binary version, which can be used directly without installation.
 	$  wget https://github.com/Nextomics/NextDenovo/releases/download/v2.1-beta.0/NextDenovo.tgz
 	$  tar -vxzf NextDenovo.tgz
-###### 添加可执行权限
+###### Add executable permissions.
 	$  cd NextDenovo
 	$  chmod -R 755 *
-###### 添加至环境变量
+###### Add to environment variables.
 	$  export PATH=~/software/NextDenovo/:$PATH
 	$  export PATH=~/software/NextDenovo/bin/:$PATH
-###### 这时候没什么问题的话就可直接使用了
-###### 软件运行需要python2.7，提示缺少模块时安装即可；但不支持python3
+###### If there is no problem at this time, you can use it directly.
+###### The software needs python2.7 to run, it can be installed when the module is missing, but does not support python3.
 	$  nextDenovo -h
 * ### 4.2)  在input.fofn中记录文件的实际位置
 * ### 4.3) 复制和修改配置文件：https://www.jianshu.com/p/fa26792435eb  http://blog.sciencenet.cn/blog-3406804-1204832.html
